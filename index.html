@@ -3,843 +3,202 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Fuad's Toolbox — Teaching &amp; Utility Apps</title>
-<style>
-  :root {
-    --navy: #1a2b4c;
-    --teal: #0f7a6e;
-    --amber: #E8A020;
-    --bg: #f4f6f8;
-    --card: #ffffff;
-    --border: #e2e2de;
-    --ink: #1a1a1a;
-    --ink-faint: #767676;
-  }
-  * { box-sizing: border-box; }
-  body {
-    margin: 0;
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Arial, sans-serif;
-    background: var(--bg);
-    color: var(--ink);
-    min-height: 100vh;
-  }
-  header.hub-header {
-    background: linear-gradient(120deg, var(--navy), #24406e);
-    color: #fff;
-    padding: 28px 24px 24px;
-    text-align: center;
-  }
-  header.hub-header h1 {
-    margin: 0 0 6px;
-    font-size: 26px;
-    font-weight: 700;
-    letter-spacing: -.3px;
-  }
-  header.hub-header p {
-    margin: 0;
-    color: rgba(255,255,255,.75);
-    font-size: 14px;
-  }
-
-  nav.tabbar {
-    display: flex;
-    justify-content: center;
-    gap: 10px;
-    flex-wrap: wrap;
-    padding: 18px 16px;
-    background: var(--card);
-    border-bottom: 1px solid var(--border);
-    position: sticky;
-    top: 0;
-    z-index: 50;
-    box-shadow: 0 2px 8px rgba(0,0,0,.04);
-  }
-  .tab-btn {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    padding: 10px 18px;
-    border-radius: 999px;
-    border: 1.5px solid var(--border);
-    background: var(--bg);
-    color: var(--ink);
-    font-size: 14px;
-    font-weight: 600;
-    cursor: pointer;
-    transition: all .15s;
-  }
-  .tab-btn .emoji { font-size: 16px; }
-  .tab-btn:hover { border-color: var(--teal); }
-  .tab-btn.active {
-    background: var(--teal);
-    border-color: var(--teal);
-    color: #fff;
-  }
-
-  main.hub-main {
-    max-width: 1100px;
-    margin: 0 auto;
-    padding: 24px 16px 48px;
-  }
-
-  .app-frame-wrap {
-    display: none;
-    background: var(--card);
-    border: 1px solid var(--border);
-    border-radius: 14px;
-    overflow: hidden;
-    box-shadow: 0 6px 24px rgba(0,0,0,.08);
-  }
-  .app-frame-wrap.active { display: block; }
-
-  .app-frame-header {
-    padding: 14px 20px;
-    border-bottom: 1px solid var(--border);
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    background: #fafbfb;
-    flex-wrap: wrap;
-    gap: 12px;
-  }
-  .app-frame-header .title {
-    font-weight: 700;
-    font-size: 15px;
-    color: var(--navy);
-  }
-  .app-frame-header .desc {
-    font-size: 12.5px;
-    color: var(--ink-faint);
-    margin-top: 2px;
-  }
-  .open-new-tab {
-    font-size: 12.5px;
-    color: var(--teal);
-    text-decoration: none;
-    font-weight: 600;
-    border: 1.5px solid var(--teal);
-    padding: 6px 12px;
-    border-radius: 8px;
-    white-space: nowrap;
-    cursor: pointer;
-    background: #fff;
-  }
-  .open-new-tab:hover { background: var(--teal); color: #fff; }
-
-  iframe.app-frame {
-    width: 100%;
-    height: 78vh;
-    min-height: 560px;
-    border: none;
-    display: block;
-    background: #fff;
-  }
-
-  .landing-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-    gap: 18px;
-  }
-  .app-card {
-    background: var(--card);
-    border: 1px solid var(--border);
-    border-radius: 14px;
-    padding: 24px;
-    cursor: pointer;
-    transition: transform .15s, box-shadow .15s;
-    box-shadow: 0 2px 8px rgba(0,0,0,.04);
-  }
-  .app-card:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 10px 24px rgba(0,0,0,.1);
-  }
-  .app-card .icon { font-size: 34px; margin-bottom: 12px; }
-  .app-card h3 { margin: 0 0 8px; font-size: 17px; color: var(--navy); }
-  .app-card p { margin: 0; font-size: 13.5px; color: var(--ink-faint); line-height: 1.5; }
-  .app-card .go {
-    margin-top: 14px;
-    font-size: 13px;
-    font-weight: 700;
-    color: var(--teal);
-  }
-
-  #landingView.hidden { display: none; }
-
-  /* Add App Card Styles */
-  .add-app-card {
-    border: 2px dashed var(--teal);
-    background: rgba(15, 122, 110, 0.05);
-  }
-  .add-app-card h3 { color: var(--teal); }
-
-  /* Modal Styles */
-  .modal-overlay {
-    display: none;
-    position: fixed;
-    top: 0; left: 0; right: 0; bottom: 0;
-    background: rgba(0,0,0,0.5);
-    z-index: 1000;
-    justify-content: center;
-    align-items: center;
-  }
-  .modal-overlay.active { display: flex; }
-  .modal-content {
-    background: var(--card);
-    padding: 32px;
-    border-radius: 16px;
-    width: 90%;
-    max-width: 500px;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.2);
-    max-height: 90vh;
-    overflow-y: auto;
-  }
-  .modal-content h2 {
-    margin: 0 0 20px;
-    color: var(--navy);
-    font-size: 22px;
-  }
-  .modal-content label {
-    display: block;
-    font-size: 13px;
-    font-weight: 600;
-    color: var(--ink);
-    margin-bottom: 6px;
-    margin-top: 14px;
-  }
-  .modal-content input, .modal-content textarea {
-    width: 100%;
-    padding: 10px 12px;
-    border: 1.5px solid var(--border);
-    border-radius: 8px;
-    font-size: 14px;
-    font-family: inherit;
-    color: var(--ink);
-    box-sizing: border-box;
-  }
-  .modal-content textarea {
-    min-height: 100px;
-    resize: vertical;
-  }
-  .modal-content textarea.code-input {
-    min-height: 200px;
-    font-family: monospace;
-    font-size: 12px;
-  }
-  .modal-actions {
-    display: flex;
-    gap: 12px;
-    justify-content: flex-end;
-    margin-top: 24px;
-  }
-  .btn-cancel {
-    padding: 10px 20px;
-    border-radius: 8px;
-    border: 1.5px solid var(--border);
-    background: #fff;
-    color: var(--ink);
-    font-weight: 600;
-    cursor: pointer;
-  }
-  .btn-save {
-    padding: 10px 20px;
-    border-radius: 8px;
-    border: none;
-    background: var(--teal);
-    color: #fff;
-    font-weight: 600;
-    cursor: pointer;
-  }
-</style>
-</head>
-<body>
-
-<header class="hub-header">
-  <h1>🧰 Fuad's Toolbox</h1>
-  <p>A collection of teaching &amp; utility web apps — all in one place</p>
-</header>
-
-<nav class="tabbar">
-  <button class="tab-btn active" data-target="landing" onclick="showView('landing')">
-    <span class="emoji">🏠</span> Home
-  </button>
-  <button class="tab-btn" data-target="app1" onclick="showView('app1')">
-    <span class="emoji">🎯</span> Exam Calculator
-  </button>
-  <button class="tab-btn" data-target="app2" onclick="showView('app2')">
-    <span class="emoji">📊</span> IBC Fee Analyzer
-  </button>
-  <button class="tab-btn" data-target="app3" onclick="showView('app3')">
-    <span class="emoji">🎬</span> SRT Timestamp Shifter
-  </button>
-</nav>
-
-<main class="hub-main">
-
-  <div id="landingView">
-    <div class="landing-grid">
-      <div class="app-card" onclick="showView('app1')">
-        <div class="icon">🎯</div>
-        <h3>Exam Time/Marks Calculator</h3>
-        <p>Set a reference exam (marks &amp; time) and instantly convert between marks and time needed — handy for pacing practice papers.</p>
-        <div class="go">Open tool →</div>
-      </div>
-
-      <div class="app-card" onclick="showView('app2')">
-        <div class="icon">📊</div>
-        <h3>IBC Fee Analyzer</h3>
-        <p>Upload an Excel fee sheet, select months &amp; subject, and instantly see who has paid or has fees due — with one-click PDF export including separate Mock Collection sections.</p>
-        <div class="go">Open tool →</div>
-      </div>
-
-      <div class="app-card" onclick="showView('app3')">
-        <div class="icon">🎬</div>
-        <h3>SRT Timestamp Shifter</h3>
-        <p>Upload a subtitle (.srt) file and shift every timestamp forward or backward by any number of seconds — with a live preview before download.</p>
-        <div class="go">Open tool →</div>
-      </div>
-
-      <div class="app-card add-app-card" onclick="openAddAppModal()">
-        <div class="icon">➕</div>
-        <h3>Add Custom App</h3>
-        <p>Paste your own HTML code to create a new custom tool and add it to your toolbox.</p>
-        <div class="go">Add tool →</div>
-      </div>
-    </div>
-  </div>
-
-  <div class="app-frame-wrap" id="view-app1">
-    <div class="app-frame-header">
-      <div>
-        <div class="title">🎯 Exam Time/Marks Calculator</div>
-        <div class="desc">Convert between exam marks and time allowance</div>
-      </div>
-      <a class="open-new-tab" onclick="openInNewTab('app1')">Open in new tab ↗</a>
-    </div>
-    <iframe class="app-frame" id="frame-app1"></iframe>
-  </div>
-
-  <div class="app-frame-wrap" id="view-app2">
-    <div class="app-frame-header">
-      <div>
-        <div class="title">📊 IBC Fee Analyzer</div>
-        <div class="desc">Upload &amp; analyze fee collection Excel sheets (Fees + Mock sections)</div>
-      </div>
-      <a class="open-new-tab" onclick="openInNewTab('app2')">Open in new tab ↗</a>
-    </div>
-    <iframe class="app-frame" id="frame-app2"></iframe>
-  </div>
-
-  <div class="app-frame-wrap" id="view-app3">
-    <div class="app-frame-header">
-      <div>
-        <div class="title">🎬 SRT Timestamp Shifter</div>
-        <div class="desc">Shift subtitle timestamps forward or backward</div>
-      </div>
-      <a class="open-new-tab" onclick="openInNewTab('app3')">Open in new tab ↗</a>
-    </div>
-    <iframe class="app-frame" id="frame-app3"></iframe>
-  </div>
-
-</main>
-
-<div id="addAppModal" class="modal-overlay">
-  <div class="modal-content">
-    <h2>Add Custom App</h2>
-    <label for="newAppTitle">App Title</label>
-    <input type="text" id="newAppTitle" placeholder="e.g., My Custom Tool">
-    
-    <label for="newAppIcon">Icon (Emoji)</label>
-    <input type="text" id="newAppIcon" placeholder="e.g., 🛠️" maxlength="4">
-    
-    <label for="newAppDesc">Description</label>
-    <textarea id="newAppDesc" placeholder="Brief description of the app..."></textarea>
-    
-    <label for="newAppCode">HTML Code</label>
-    <textarea id="newAppCode" class="code-input" placeholder="Paste your full HTML code here..."></textarea>
-    
-    <div class="modal-actions">
-      <button class="btn-cancel" onclick="closeAddAppModal()">Cancel</button>
-      <button class="btn-save" onclick="saveNewApp()">Save & Add App</button>
-    </div>
-  </div>
-</div>
-
-<!-- ═══ IBC FEE ANALYZER SOURCE (v2 — with Mock Collection support) ═══ -->
-<script type="text/plain" id="src-app2">
-<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>IBC Fee Analyzer</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"><\/script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"><\/script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"><\/script>
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
-
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
   :root {
-    --teal-deep:  #0D5C63;
-    --teal-mid:   #1A7F89;
-    --teal-light: #E6F4F5;
-    --amber:      #E8A020;
-    --amber-light:#FEF3DC;
-    --red:        #C0392B;
-    --red-light:  #FDEDEC;
-    --green:      #1E8449;
-    --green-light:#EAFAF1;
-    --cream:      #FAFAF8;
-    --white:      #FFFFFF;
-    --ink:        #1A1A1A;
-    --ink-mid:    #444444;
-    --ink-faint:  #888888;
+    --teal-deep:  #0D5C63; --teal-mid:   #1A7F89; --teal-light: #E6F4F5;
+    --amber:      #E8A020; --amber-light:#FEF3DC; --amber-deep: #946814;
+    --red:        #C0392B; --red-light:  #FDEDEC;
+    --green:      #1E8449; --green-light:#EAFAF1;
+    --cream:      #FAFAF8; --white:      #FFFFFF;
+    --ink:        #1A1A1A; --ink-mid:    #444444; --ink-faint:  #888888;
     --border:     #E2E2DE;
     --shadow-sm:  0 1px 4px rgba(0,0,0,.06);
     --shadow-md:  0 4px 16px rgba(0,0,0,.10);
     --radius:     10px;
   }
+  body { font-family: 'Inter', sans-serif; background: var(--cream); color: var(--ink); min-height: 100vh; line-height: 1.5; }
 
-  body {
-    font-family: 'Inter', sans-serif;
-    background: var(--cream);
-    color: var(--ink);
-    min-height: 100vh;
-    line-height: 1.5;
-  }
-
-  .app-header {
-    background: var(--teal-deep);
-    padding: 0 32px;
-    height: 64px;
-    display: flex;
-    align-items: center;
-    gap: 14px;
-    position: sticky;
-    top: 0;
-    z-index: 100;
-    box-shadow: 0 2px 12px rgba(0,0,0,.18);
-  }
-  .logo-mark {
-    width: 38px; height: 38px;
-    background: var(--amber);
-    border-radius: 8px;
-    display: grid;
-    place-items: center;
-    font-family: 'JetBrains Mono', monospace;
-    font-weight: 500;
-    font-size: 14px;
-    color: var(--teal-deep);
-    letter-spacing: -.5px;
-    flex-shrink: 0;
-  }
+  .app-header { background: var(--teal-deep); padding: 0 32px; height: 64px; display: flex; align-items: center; gap: 14px; position: sticky; top: 0; z-index: 100; box-shadow: 0 2px 12px rgba(0,0,0,.18); }
+  .logo-mark { width: 38px; height: 38px; background: var(--amber); border-radius: 8px; display: grid; place-items: center; font-family: 'JetBrains Mono', monospace; font-weight: 500; font-size: 14px; color: var(--teal-deep); letter-spacing: -.5px; flex-shrink: 0; }
   .app-title { color: #fff; font-size: 17px; font-weight: 600; letter-spacing: -.2px; }
   .app-sub   { color: rgba(255,255,255,.55); font-size: 12px; font-weight: 400; margin-left: auto; }
 
   .main { max-width: 960px; margin: 0 auto; padding: 40px 24px 80px; }
 
-  .step-label {
-    display: flex; align-items: center; gap: 10px;
-    margin-bottom: 14px;
-  }
-  .step-num {
-    width: 26px; height: 26px;
-    background: var(--teal-deep);
-    color: #fff;
-    border-radius: 50%;
-    font-size: 12px;
-    font-weight: 700;
-    display: grid; place-items: center;
-    flex-shrink: 0;
-  }
+  .step-label { display: flex; align-items: center; gap: 10px; margin-bottom: 14px; }
+  .step-num { width: 26px; height: 26px; background: var(--teal-deep); color: #fff; border-radius: 50%; font-size: 12px; font-weight: 700; display: grid; place-items: center; flex-shrink: 0; }
   .step-text { font-size: 13px; font-weight: 600; color: var(--teal-deep); text-transform: uppercase; letter-spacing: .6px; }
 
-  .card {
-    background: var(--white);
-    border: 1px solid var(--border);
-    border-radius: var(--radius);
-    box-shadow: var(--shadow-sm);
-    padding: 28px;
-    margin-bottom: 28px;
-  }
+  .card { background: var(--white); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow-sm); padding: 28px; margin-bottom: 28px; }
 
-  .upload-zone {
-    border: 2px dashed var(--border);
-    border-radius: var(--radius);
-    padding: 52px 24px;
-    text-align: center;
-    cursor: pointer;
-    transition: border-color .2s, background .2s;
-    position: relative;
-  }
-  .upload-zone:hover, .upload-zone.drag-over {
-    border-color: var(--teal-mid);
-    background: var(--teal-light);
-  }
-  .upload-zone input[type=file] {
-    position: absolute; inset: 0; opacity: 0; cursor: pointer; width: 100%; height: 100%;
-  }
-  .upload-icon {
-    font-size: 40px; margin-bottom: 12px;
-    filter: grayscale(.3);
-  }
+  .upload-zone { border: 2px dashed var(--border); border-radius: var(--radius); padding: 52px 24px; text-align: center; cursor: pointer; transition: border-color .2s, background .2s; position: relative; }
+  .upload-zone:hover, .upload-zone.drag-over { border-color: var(--teal-mid); background: var(--teal-light); }
+  .upload-zone input[type=file] { position: absolute; inset: 0; opacity: 0; cursor: pointer; width: 100%; height: 100%; }
+  .upload-icon { font-size: 40px; margin-bottom: 12px; filter: grayscale(.3); }
   .upload-zone h3 { font-size: 16px; font-weight: 600; color: var(--ink); margin-bottom: 6px; }
   .upload-zone p { font-size: 13px; color: var(--ink-faint); }
-  .upload-zone .file-name {
-    margin-top: 14px;
-    display: inline-block;
-    background: var(--teal-light);
-    color: var(--teal-deep);
-    font-size: 13px;
-    font-weight: 500;
-    padding: 6px 14px;
-    border-radius: 20px;
-    font-family: 'JetBrains Mono', monospace;
-  }
+  .upload-zone .file-name { margin-top: 14px; display: inline-block; background: var(--teal-light); color: var(--teal-deep); font-size: 13px; font-weight: 500; padding: 6px 14px; border-radius: 20px; font-family: 'JetBrains Mono', monospace; }
 
-  .config-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 20px;
-  }
+  .config-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
   @media(max-width:600px) { .config-grid { grid-template-columns: 1fr; } }
 
-  label.field-label {
-    display: block;
-    font-size: 12px;
-    font-weight: 600;
-    color: var(--ink-mid);
-    text-transform: uppercase;
-    letter-spacing: .5px;
-    margin-bottom: 7px;
-  }
-  select, .multi-check-box {
-    width: 100%;
-    border: 1.5px solid var(--border);
-    border-radius: 7px;
-    padding: 10px 13px;
-    font-family: 'Inter', sans-serif;
-    font-size: 14px;
-    color: var(--ink);
-    background: var(--cream);
-    appearance: none;
-    outline: none;
-    transition: border-color .15s;
-  }
-  select:focus { border-color: var(--teal-mid); }
+  label.field-label { display: block; font-size: 12px; font-weight: 600; color: var(--ink-mid); text-transform: uppercase; letter-spacing: .5px; margin-bottom: 7px; }
+  .field-hint { font-size: 11px; color: var(--ink-faint); margin-top: 6px; font-style: italic; }
 
-  .subject-chips {
-    display: flex; flex-wrap: wrap; gap: 8px; margin-top: 4px;
-  }
-  .chip {
-    padding: 5px 13px;
-    border-radius: 20px;
-    font-size: 13px;
-    font-weight: 500;
-    border: 1.5px solid var(--border);
-    background: var(--cream);
-    cursor: pointer;
-    transition: all .15s;
-    user-select: none;
-  }
-  .chip.active {
-    background: var(--teal-deep);
-    color: #fff;
-    border-color: var(--teal-deep);
-  }
+  .chip-row { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 4px; }
+  .chip { padding: 5px 13px; border-radius: 20px; font-size: 13px; font-weight: 500; border: 1.5px solid var(--border); background: var(--cream); cursor: pointer; transition: all .15s; user-select: none; }
+  .chip.active { background: var(--teal-deep); color: #fff; border-color: var(--teal-deep); }
+  .chip.amber { border-color: #e0c68a; background: #fdf8ec; color: var(--amber-deep); }
+  .chip.amber.active { background: var(--amber); color: #fff; border-color: var(--amber); }
+  .chip.disabled { opacity: .45; cursor: not-allowed; }
 
-  .btn-analyze {
-    display: block;
-    width: 100%;
-    margin-top: 22px;
-    padding: 14px;
-    background: var(--teal-deep);
-    color: #fff;
-    border: none;
-    border-radius: 8px;
-    font-size: 15px;
-    font-weight: 600;
-    cursor: pointer;
-    letter-spacing: .2px;
-    transition: background .15s, transform .1s;
-  }
+  .section-divider { border: none; border-top: 1px dashed var(--border); margin: 22px 0 18px; }
+  .section-title { font-size: 14px; font-weight: 700; color: var(--amber-deep); text-transform: uppercase; letter-spacing: .5px; margin-bottom: 14px; display: flex; align-items: center; gap: 8px; }
+  .section-title::before { content: ''; display: inline-block; width: 4px; height: 18px; background: var(--amber); border-radius: 2px; }
+
+  .btn-analyze { display: block; width: 100%; margin-top: 22px; padding: 14px; background: var(--teal-deep); color: #fff; border: none; border-radius: 8px; font-size: 15px; font-weight: 600; cursor: pointer; letter-spacing: .2px; transition: background .15s, transform .1s; }
   .btn-analyze:hover  { background: var(--teal-mid); }
   .btn-analyze:active { transform: scale(.99); }
   .btn-analyze:disabled { background: var(--border); color: var(--ink-faint); cursor: not-allowed; }
 
-  .summary-grid {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 16px;
-    margin-bottom: 28px;
-  }
+  .summary-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 28px; }
   @media(max-width:700px) { .summary-grid { grid-template-columns: 1fr 1fr; } }
 
-  .stat-card {
-    background: var(--white);
-    border: 1px solid var(--border);
-    border-radius: var(--radius);
-    padding: 20px 18px;
-    position: relative;
-    overflow: hidden;
-  }
-  .stat-card::before {
-    content: '';
-    position: absolute;
-    top: 0; left: 0; right: 0;
-    height: 3px;
-  }
+  .stat-card { background: var(--white); border: 1px solid var(--border); border-radius: var(--radius); padding: 20px 18px; position: relative; overflow: hidden; }
+  .stat-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; }
   .stat-card.teal::before  { background: var(--teal-deep); }
   .stat-card.amber::before { background: var(--amber); }
   .stat-card.green::before { background: var(--green); }
   .stat-card.red::before   { background: var(--red); }
 
   .stat-label { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: .5px; color: var(--ink-faint); margin-bottom: 8px; }
-  .stat-value {
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 26px;
-    font-weight: 500;
-    color: var(--ink);
-    line-height: 1;
-  }
+  .stat-value { font-family: 'JetBrains Mono', monospace; font-size: 26px; font-weight: 500; color: var(--ink); line-height: 1; animation: countUp .4s ease both; }
   .stat-value.teal  { color: var(--teal-deep); }
   .stat-value.amber { color: var(--amber); }
   .stat-value.green { color: var(--green); }
   .stat-value.red   { color: var(--red); }
 
   .tabs { display: flex; gap: 4px; border-bottom: 2px solid var(--border); margin-bottom: 20px; }
-  .tab-btn {
-    padding: 10px 20px;
-    border: none;
-    background: none;
-    font-family: 'Inter', sans-serif;
-    font-size: 14px;
-    font-weight: 500;
-    color: var(--ink-faint);
-    cursor: pointer;
-    border-bottom: 2px solid transparent;
-    margin-bottom: -2px;
-    transition: color .15s;
-  }
+  .tab-btn { padding: 10px 20px; border: none; background: none; font-family: 'Inter', sans-serif; font-size: 14px; font-weight: 500; color: var(--ink-faint); cursor: pointer; border-bottom: 2px solid transparent; margin-bottom: -2px; transition: color .15s; }
   .tab-btn.active { color: var(--teal-deep); border-bottom-color: var(--teal-deep); font-weight: 600; }
 
-  .search-bar {
-    display: flex; gap: 10px; margin-bottom: 14px; align-items: center;
-  }
-  .search-input {
-    flex: 1;
-    border: 1.5px solid var(--border);
-    border-radius: 7px;
-    padding: 9px 13px;
-    font-family: 'Inter', sans-serif;
-    font-size: 14px;
-    outline: none;
-    transition: border-color .15s;
-  }
+  .search-bar { display: flex; gap: 10px; margin-bottom: 14px; align-items: center; }
+  .search-input { flex: 1; border: 1.5px solid var(--border); border-radius: 7px; padding: 9px 13px; font-family: 'Inter', sans-serif; font-size: 14px; outline: none; transition: border-color .15s; }
   .search-input:focus { border-color: var(--teal-mid); }
 
   .table-wrap { overflow-x: auto; border-radius: 8px; border: 1px solid var(--border); }
-  table {
-    width: 100%;
-    border-collapse: collapse;
-    font-size: 13.5px;
-  }
-  th {
-    background: var(--teal-deep);
-    color: #fff;
-    padding: 11px 14px;
-    text-align: left;
-    font-weight: 600;
-    font-size: 12px;
-    text-transform: uppercase;
-    letter-spacing: .4px;
-    white-space: nowrap;
-  }
-  td {
-    padding: 10px 14px;
-    border-bottom: 1px solid var(--border);
-    vertical-align: middle;
-  }
+  table { width: 100%; border-collapse: collapse; font-size: 13.5px; }
+  th { background: var(--teal-deep); color: #fff; padding: 11px 14px; text-align: left; font-weight: 600; font-size: 12px; text-transform: uppercase; letter-spacing: .4px; white-space: nowrap; }
+  td { padding: 10px 14px; border-bottom: 1px solid var(--border); vertical-align: middle; }
   tr:last-child td { border-bottom: none; }
   tr:nth-child(even) td { background: #F8FAFA; }
   tr:hover td { background: var(--teal-light); }
-
   td.serial { font-family: 'JetBrains Mono', monospace; font-size: 12px; color: var(--ink-faint); }
   td.amount { font-family: 'JetBrains Mono', monospace; text-align: right; font-weight: 500; }
   td.amount.paid { color: var(--green); }
 
-  .badge {
-    display: inline-block;
-    padding: 2px 10px;
-    border-radius: 20px;
-    font-size: 11px;
-    font-weight: 700;
-    letter-spacing: .3px;
-    text-transform: uppercase;
-  }
+  .badge { display: inline-block; padding: 2px 10px; border-radius: 20px; font-size: 11px; font-weight: 700; letter-spacing: .3px; text-transform: uppercase; }
   .badge.due  { background: var(--red-light);   color: var(--red); }
   .badge.paid { background: var(--green-light); color: var(--green); }
 
-  .empty-state {
-    text-align: center;
-    padding: 40px;
-    color: var(--ink-faint);
-    font-size: 14px;
-  }
-  .row-count {
-    font-size: 12px;
-    color: var(--ink-faint);
-    margin-left: auto;
-    white-space: nowrap;
-  }
+  .empty-state { text-align: center; padding: 40px; color: var(--ink-faint); font-size: 14px; }
+  .row-count { font-size: 12px; color: var(--ink-faint); margin-left: auto; white-space: nowrap; }
 
-  .export-bar {
-    display: flex;
-    gap: 12px;
-    align-items: center;
-    margin-top: 20px;
-  }
-  .btn-pdf {
-    padding: 12px 24px;
-    background: var(--red);
-    color: #fff;
-    border: none;
-    border-radius: 8px;
-    font-size: 14px;
-    font-weight: 600;
-    cursor: pointer;
-    display: flex; align-items: center; gap: 8px;
-    transition: background .15s, transform .1s;
-  }
+  .export-bar { display: flex; gap: 12px; align-items: center; margin-top: 20px; flex-wrap: wrap; }
+  .btn-pdf { padding: 12px 24px; background: var(--red); color: #fff; border: none; border-radius: 8px; font-size: 14px; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 8px; transition: background .15s, transform .1s; }
   .btn-pdf:hover  { background: #A93226; }
   .btn-pdf:active { transform: scale(.98); }
-
-  .btn-secondary {
-    padding: 11px 20px;
-    background: var(--white);
-    color: var(--teal-deep);
-    border: 1.5px solid var(--teal-deep);
-    border-radius: 8px;
-    font-size: 14px;
-    font-weight: 600;
-    cursor: pointer;
-    transition: all .15s;
-  }
+  .btn-secondary { padding: 11px 20px; background: var(--white); color: var(--teal-deep); border: 1.5px solid var(--teal-deep); border-radius: 8px; font-size: 14px; font-weight: 600; cursor: pointer; transition: all .15s; }
   .btn-secondary:hover { background: var(--teal-light); }
 
-  #toast {
-    position: fixed;
-    bottom: 28px; right: 28px;
-    background: var(--teal-deep);
-    color: #fff;
-    padding: 12px 20px;
-    border-radius: 8px;
-    font-size: 14px;
-    font-weight: 500;
-    box-shadow: var(--shadow-md);
-    transform: translateY(80px);
-    opacity: 0;
-    transition: all .3s;
-    z-index: 999;
-  }
+  #toast { position: fixed; bottom: 28px; right: 28px; background: var(--teal-deep); color: #fff; padding: 12px 20px; border-radius: 8px; font-size: 14px; font-weight: 500; box-shadow: var(--shadow-md); transform: translateY(80px); opacity: 0; transition: all .3s; z-index: 999; }
   #toast.show { transform: translateY(0); opacity: 1; }
 
   .hidden { display: none !important; }
 
-  .spinner {
-    display: inline-block;
-    width: 16px; height: 16px;
-    border: 2px solid rgba(255,255,255,.3);
-    border-top-color: #fff;
-    border-radius: 50%;
-    animation: spin .7s linear infinite;
-    margin-right: 6px;
-  }
+  .spinner { display: inline-block; width: 16px; height: 16px; border: 2px solid rgba(255,255,255,.3); border-top-color: #fff; border-radius: 50%; animation: spin .7s linear infinite; margin-right: 6px; }
   @keyframes spin { to { transform: rotate(360deg); } }
-
-  @keyframes countUp {
-    from { opacity: 0; transform: translateY(8px); }
-    to   { opacity: 1; transform: translateY(0); }
-  }
-  .stat-value { animation: countUp .4s ease both; }
-
-  .month-chips { display: flex; flex-wrap: wrap; gap: 8px; }
+  @keyframes countUp { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
 </style>
 </head>
 <body>
 
 <header class="app-header">
   <div class="logo-mark">IBC</div>
-  <div>
-    <div class="app-title">Fee Analyzer</div>
-  </div>
+  <div><div class="app-title">Fee Analyzer</div></div>
   <div class="app-sub">Upload · Analyze · Export PDF</div>
 </header>
 
 <main class="main">
 
   <!-- STEP 1: UPLOAD -->
-  <div class="step-label">
-    <div class="step-num">1</div>
-    <div class="step-text">Upload Excel File</div>
-  </div>
+  <div class="step-label"><div class="step-num">1</div><div class="step-text">Upload Excel File</div></div>
   <div class="card">
     <div class="upload-zone" id="uploadZone">
       <input type="file" accept=".xlsx,.xls" id="fileInput">
       <div class="upload-icon">📊</div>
       <h3>Drop your Excel file here</h3>
-      <p>or click to browse — supports .xlsx and .xls (fee + mock collection blocks auto-detected)</p>
+      <p>or click to browse — supports .xlsx and .xls</p>
       <div class="file-name hidden" id="fileName"></div>
     </div>
   </div>
 
   <!-- STEP 2: CONFIG -->
   <div id="configSection" class="hidden">
-    <div class="step-label">
-      <div class="step-num">2</div>
-      <div class="step-text">Select Months & Subject</div>
-    </div>
+    <div class="step-label"><div class="step-num">2</div><div class="step-text">Configure Analysis</div></div>
     <div class="card">
+
+      <!-- FEES CONFIG -->
+      <div class="section-title">📋 Fees Collection</div>
       <div class="config-grid">
         <div>
-          <label class="field-label">Months to Analyze</label>
-          <div class="month-chips" id="monthChips"></div>
+          <label class="field-label">Months</label>
+          <div class="chip-row" id="monthChips"></div>
         </div>
         <div>
-          <label class="field-label">Subject / Fee Column</label>
-          <div class="subject-chips" id="subjectChips"></div>
+          <label class="field-label">Fee Subject</label>
+          <div class="chip-row" id="subjectChips"></div>
         </div>
       </div>
-      <button class="btn-analyze" id="analyzeBtn" disabled>
-        Analyze Collection
-      </button>
+
+      <hr class="section-divider">
+
+      <!-- MOCK CONFIG -->
+      <div class="section-title">📝 Mock Collection</div>
+      <div style="margin-bottom:14px;">
+        <label class="field-label">Months</label>
+        <div class="field-hint">✓ Uses the same months selected above for Fees.</div>
+      </div>
+      <div>
+        <label class="field-label">Mock Subjects <span style="font-weight:400; color:var(--ink-faint);">(multi-select — toggle on/off)</span></label>
+        <div class="chip-row" id="mockSubjectChips"></div>
+        <div class="field-hint" id="mockHint">No mock collection blocks detected in this file.</div>
+      </div>
+
+      <button class="btn-analyze" id="analyzeBtn" disabled>Analyze Collection</button>
     </div>
   </div>
 
   <!-- STEP 3: RESULTS -->
   <div id="resultsSection" class="hidden">
-    <div class="step-label">
-      <div class="step-num">3</div>
-      <div class="step-text">Analysis Results</div>
-    </div>
-
-    <!-- Summary cards -->
+    <div class="step-label"><div class="step-num">3</div><div class="step-text">Analysis Results</div></div>
     <div class="summary-grid" id="summaryGrid"></div>
-
-    <!-- Tables -->
     <div class="card">
       <div class="tabs">
-        <button class="tab-btn"         id="tabDue"   onclick="switchTab('due')">⚠️ Fees Due</button>
-        <button class="tab-btn active" id="tabPaid"  onclick="switchTab('paid')">✓ Collected</button>
-        <button class="tab-btn"         id="tabAll"   onclick="switchTab('all')">📋 All Students</button>
+        <button class="tab-btn" id="tabDue"  onclick="switchTab('due')">⚠️ Fees Due</button>
+        <button class="tab-btn active" id="tabPaid" onclick="switchTab('paid')">✓ Fees Collected</button>
+        <button class="tab-btn" id="tabAll"  onclick="switchTab('all')">📋 All Students</button>
       </div>
-
       <div class="search-bar">
         <input class="search-input" id="searchInput" placeholder="Search by name or serial…" oninput="filterTable()">
         <span class="row-count" id="rowCount"></span>
       </div>
-
       <div class="table-wrap">
         <table id="mainTable">
           <thead id="tableHead"></thead>
@@ -847,11 +206,8 @@
         </table>
         <div class="empty-state hidden" id="emptyState">No records found.</div>
       </div>
-
       <div class="export-bar">
-        <button class="btn-pdf" onclick="exportPDF()">
-          <span>📄</span> Export Paid List as PDF
-        </button>
+        <button class="btn-pdf" onclick="exportPDF()"><span>📄</span> Export Paid List as PDF</button>
         <button class="btn-secondary" onclick="resetApp()">↩ New Analysis</button>
       </div>
     </div>
@@ -865,12 +221,14 @@
 // ─── STATE ──────────────────────────────────────────────────────────────
 let workbook = null;
 let allData  = [];    // parsed FEE rows across all selected sheets
-let mockData = [];    // parsed MOCK COLLECTION rows across all selected sheets
-let mockTitle = '';   // detected mock block title (e.g. "Mock Collection For OCT-NOV 2026")
+let mockDataRaw = []; // ALL parsed MOCK rows (unfiltered by subject)
+let mockTitle = '';
 let selectedMonths   = new Set();
 let selectedSubject  = '';
-let currentTab       = 'due';
-let currentRows      = [];
+let selectedMockSubjects = new Set();
+let availableMockSubjects  = [];
+let currentTab = 'due';
+let currentRows = [];
 
 const SKIP_NAMES = /done|total|expenses|name|stationary|saiful|beki|rent|salary|ibc|details|amount|subtotal/i;
 const KNOWN_SUBJECTS = ['MATHS','ACC','BUSINESS','ECONOMICS','ENGLISH','BENGOLI','CHEMISTRY','PHYSICS','BIOLOGY','Law','ICT'];
@@ -882,8 +240,7 @@ const fileInput  = document.getElementById('fileInput');
 uploadZone.addEventListener('dragover', e => { e.preventDefault(); uploadZone.classList.add('drag-over'); });
 uploadZone.addEventListener('dragleave', ()=> uploadZone.classList.remove('drag-over'));
 uploadZone.addEventListener('drop', e => {
-  e.preventDefault();
-  uploadZone.classList.remove('drag-over');
+  e.preventDefault(); uploadZone.classList.remove('drag-over');
   const file = e.dataTransfer.files[0];
   if (file) handleFile(file);
 });
@@ -891,8 +248,7 @@ fileInput.addEventListener('change', e => { if (e.target.files[0]) handleFile(e.
 
 function handleFile(file) {
   const fn = document.getElementById('fileName');
-  fn.textContent = file.name;
-  fn.classList.remove('hidden');
+  fn.textContent = file.name; fn.classList.remove('hidden');
   const reader = new FileReader();
   reader.onload = e => {
     try {
@@ -900,23 +256,68 @@ function handleFile(file) {
       buildConfig();
       showToast('✅ File loaded: ' + file.name);
     } catch (err) {
-      showToast(' Could not read file. Make sure it is a valid Excel file.');
+      showToast('❌ Could not read file.');
     }
   };
   reader.readAsArrayBuffer(file);
+}
+
+// ─── HELPERS ────────────────────────────────────────────────────────────
+const up = r => r.map(c => String(c).trim().toUpperCase());
+const isEmptyRow = r => r.every(c => String(c).trim() === '');
+
+/**
+ * Scans a sheet for the Mock Collection title row + subject header.
+ * Returns { titleIdx, titleText, endIdx, subjectCols: [{idx,name},...] } or null.
+ */
+function detectMockBlock(sheetName) {
+  const ws = workbook.Sheets[sheetName];
+  const raw = XLSX.utils.sheet_to_json(ws, { header: 1, defval: '' });
+  let mtIdx = -1, mtText = '';
+  for (let i = 0; i < raw.length; i++) {
+    const joined = raw[i].map(c => String(c).trim()).join(' ').replace(/\s+/g, ' ');
+    if (/mock\s+collection/i.test(joined) || (/mock/i.test(joined) && joined.length < 80 && !/name|maths|total/i.test(joined))) {
+      mtIdx = i; mtText = joined; break;
+    }
+  }
+  if (mtIdx < 0) return null;
+
+  // Skip blanks to find the subject header row
+  let h = mtIdx + 1;
+  while (h < raw.length && isEmptyRow(raw[h])) h++;
+  if (h >= raw.length) return null;
+
+  const mh = up(raw[h]);
+  const mNameIdx   = mh.findIndex(x => x === 'NAME');
+  const mSerialIdx = mh.findIndex(x => x === 'SERIAL');
+  const subjectCols = [];
+  mh.forEach((x, i) => {
+    if (x && i !== mNameIdx && i !== mSerialIdx && !/^(SL|NO|#|DATE|TOTAL|FEE|FEES)$/.test(x)) {
+      subjectCols.push({ idx: i, name: x });
+    }
+  });
+
+  // Find end of mock block (blank row, or next NAME+MATHS header)
+  let endIdx = raw.length;
+  for (let i = h + 1; i < raw.length; i++) {
+    if (isEmptyRow(raw[i])) { endIdx = i; break; }
+    const r = up(raw[i]);
+    if (r.includes('NAME') && r.includes('MATHS')) { endIdx = i; break; }
+  }
+  return { titleIdx: mtIdx, titleText: mtText, endIdx, nameIdx: mNameIdx, serialIdx: mSerialIdx, subjectCols };
 }
 
 // ─── CONFIG ─────────────────────────────────────────────────────────────
 function buildConfig() {
   const sheets = workbook.SheetNames;
 
+  // --- MONTH CHIPS ---
   const mc = document.getElementById('monthChips');
   mc.innerHTML = '';
   selectedMonths.clear();
   sheets.forEach(s => {
     const chip = document.createElement('div');
-    chip.className = 'chip';
-    chip.textContent = s;
+    chip.className = 'chip'; chip.textContent = s;
     chip.onclick = () => {
       chip.classList.toggle('active');
       if (chip.classList.contains('active')) selectedMonths.add(s);
@@ -925,22 +326,18 @@ function buildConfig() {
     };
     mc.appendChild(chip);
   });
-
-  const autoSelect = sheets.slice(-2);
-  mc.querySelectorAll('.chip').forEach(c => {
-    if (autoSelect.includes(c.textContent)) {
-      c.classList.add('active');
-      selectedMonths.add(c.textContent);
-    }
+  sheets.slice(-2).forEach(n => {
+    [...mc.querySelectorAll('.chip')].find(c => c.textContent === n)?.classList.add('active');
+    selectedMonths.add(n);
   });
 
+  // --- FEE SUBJECT CHIPS ---
   let detectedSubjects = [];
   for (const s of sheets) {
     const ws = workbook.Sheets[s];
     const raw = XLSX.utils.sheet_to_json(ws, { header: 1, defval: '' });
     for (const row of raw) {
-      const cols = row.map(c => String(c).trim().toUpperCase());
-      const found = KNOWN_SUBJECTS.filter(sub => cols.includes(sub));
+      const found = KNOWN_SUBJECTS.filter(sub => up(row).includes(sub));
       if (found.length > 2) { detectedSubjects = found; break; }
     }
     if (detectedSubjects.length) break;
@@ -949,7 +346,6 @@ function buildConfig() {
 
   const sc = document.getElementById('subjectChips');
   sc.innerHTML = '';
-  selectedSubject = '';
   detectedSubjects.forEach(sub => {
     const chip = document.createElement('div');
     chip.className = 'chip' + (sub === 'PHYSICS' ? ' active' : '');
@@ -964,6 +360,49 @@ function buildConfig() {
   });
   selectedSubject = detectedSubjects.includes('PHYSICS') ? 'PHYSICS' : detectedSubjects[0] || '';
 
+  // --- MOCK SUBJECT CHIPS (multi-select, amber-styled) ---
+  const mockSubjectSet = new Set();
+  let anyMock = false;
+  let detectedMockTitle = '';
+  sheets.forEach(s => {
+    const mb = detectMockBlock(s);
+    if (mb && mb.subjectCols.length) {
+      anyMock = true;
+      if (!detectedMockTitle) detectedMockTitle = mb.titleText;
+      mb.subjectCols.forEach(c => mockSubjectSet.add(c.name));
+    }
+  });
+  availableMockSubjects = [...mockSubjectSet];
+  selectedMockSubjects = new Set(availableMockSubjects); // default: all on
+
+  const msc = document.getElementById('mockSubjectChips');
+  const mhint = document.getElementById('mockHint');
+  msc.innerHTML = '';
+
+  if (!anyMock) {
+    mhint.textContent = '⚠️ No mock collection blocks detected in this file.';
+    mhint.style.color = 'var(--amber-deep)';
+  } else {
+    mhint.textContent = `${availableMockSubjects.length} subject(s) detected. Toggle to include/exclude from the PDF.`;
+    mhint.style.color = 'var(--ink-faint)';
+
+    availableMockSubjects.forEach(sub => {
+      const chip = document.createElement('div');
+      chip.className = 'chip amber active';
+      chip.textContent = sub;
+      chip.onclick = () => {
+        if (chip.classList.contains('active')) {
+          chip.classList.remove('active');
+          selectedMockSubjects.delete(sub);
+        } else {
+          chip.classList.add('active');
+          selectedMockSubjects.add(sub);
+        }
+      };
+      msc.appendChild(chip);
+    });
+  }
+
   document.getElementById('configSection').classList.remove('hidden');
   updateAnalyzeBtn();
 }
@@ -973,69 +412,38 @@ function updateAnalyzeBtn() {
   btn.disabled = !(selectedMonths.size > 0 && selectedSubject);
 }
 
-// ─── ANALYZE ────────────────────────────────────────────────────────────
-document.getElementById('analyzeBtn').addEventListener('click', analyze);
-
-/**
- * Parses one sheet and returns BOTH sections:
- *  - feeRows : regular monthly fee table rows
- *  - mockRows: rows from the "Mock Collection For ..." block (if present)
- */
+// ─── PARSE SHEET (returns fee + mock rows) ────────────────────────────
 function parseSheet(sheetName) {
   const ws  = workbook.Sheets[sheetName];
   const raw = XLSX.utils.sheet_to_json(ws, { header: 1, defval: '' });
 
-  const isEmptyRow = r => r.every(c => String(c).trim() === '');
-  const up = r => r.map(c => String(c).trim().toUpperCase());
-
-  // ── 1. Locate the MOCK COLLECTION title row (e.g. "Mock Collection For OCT-NOV 2026")
-  let mtIdx = -1, mtText = '';
-  for (let i = 0; i < raw.length; i++) {
-    const joined = raw[i].map(c => String(c).trim()).join(' ').replace(/\s+/g, ' ');
-    if (/mock\s+collection/i.test(joined) || (/mock/i.test(joined) && joined.length < 60)) {
-      mtIdx = i; mtText = joined; break;
-    }
-  }
-
-  // ── 2. Parse the mock block (header row + payment rows) if it exists
+  const mb = detectMockBlock(sheetName);
   const mockRows = [];
-  let mockEnd = raw.length;
-  if (mtIdx >= 0) {
-    let h = mtIdx + 1;
-    while (h < raw.length && isEmptyRow(raw[h])) h++;
-    const mh = up(raw[h] || []);
-    const mNameIdx   = mh.findIndex(x => x === 'NAME');
-    const mSerialIdx = mh.findIndex(x => x === 'SERIAL');
-    const subjCols = [];
-    mh.forEach((x, i) => {
-      if (x && i !== mNameIdx && i !== mSerialIdx && !/^(SL|NO|#|DATE|TOTAL)$/.test(x)) subjCols.push({ idx: i, name: x });
-    });
-    mockEnd = raw.length;
-    for (let i = h + 1; i < raw.length; i++) {
-      if (isEmptyRow(raw[i])) { mockEnd = i; break; }
-      const r = up(raw[i]);
-      if (r.includes('NAME') && r.includes('MATHS')) { mockEnd = i; break; }
-    }
-    for (let i = h + 1; i < mockEnd; i++) {
+
+  if (mb) {
+    for (let i = mb.titleIdx + 1; i < mb.endIdx; i++) {
+      if (isEmptyRow(raw[i])) continue;
       const r = raw[i];
-      if (isEmptyRow(r)) continue;
-      let name = mNameIdx >= 0 ? String(r[mNameIdx] || '').trim() : '';
-      if (!name) {
-        for (const c of r) { const s = String(c).trim(); if (s && isNaN(parseFloat(s))) { name = s; break; } }
-      }
+      let name = mb.nameIdx >= 0 ? String(r[mb.nameIdx] || '').trim() : '';
+      if (!name) { for (const c of r) { const s = String(c).trim(); if (s && isNaN(parseFloat(s))) { name = s; break; } } }
       if (!name || SKIP_NAMES.test(name)) continue;
-      const serial = mSerialIdx >= 0 ? String(r[mSerialIdx] || '').trim() : '';
-      subjCols.forEach(sc => {
+      const serial = mb.serialIdx >= 0 ? String(r[mb.serialIdx] || '').trim() : '';
+      mb.subjectCols.forEach(sc => {
         const amt = parseFloat(r[sc.idx]) || 0;
-        if (amt > 0) mockRows.push({ serial, name, subject: sc.name, paid: amt, total: amt, status: 'PAID', month: sheetName, date: '', type: 'mock' });
+        if (amt > 0) {
+          mockRows.push({
+            serial, name, subject: sc.name, paid: amt, total: amt,
+            status: 'PAID', month: sheetName, date: '', type: 'mock'
+          });
+        }
       });
     }
   }
 
-  // ── 3. Parse the regular FEE table (header row with NAME + MATHS, outside mock block)
+  // --- Fee table: find NAME+MATHS header OUTSIDE the mock block ---
   let headerIdx = -1, headers = [];
   for (let i = 0; i < raw.length; i++) {
-    if (mtIdx >= 0 && i >= mtIdx && i < mockEnd) continue; // skip mock region
+    if (mb && i >= mb.titleIdx && i < mb.endIdx) continue;
     const r = up(raw[i]);
     if (r.includes('NAME') && r.includes('MATHS')) { headerIdx = i; headers = raw[i].map(c => String(c).trim()); break; }
   }
@@ -1049,22 +457,28 @@ function parseSheet(sheetName) {
 
     if (subjectIdx >= 0 && nameIdx >= 0) {
       for (let i = headerIdx + 1; i < raw.length; i++) {
-        if (mtIdx >= 0 && i >= mtIdx && i < mockEnd) { if (i === mtIdx) break; else continue; }
-        const r    = raw[i];
+        if (mb && i >= mb.titleIdx && i < mb.endIdx) { if (i === mb.titleIdx) break; else continue; }
+        const r = raw[i];
         const name = String(r[nameIdx] || '').trim();
         if (!name || SKIP_NAMES.test(name)) continue;
-
-        const paid   = parseFloat(r[subjectIdx]) || 0;
-        const total  = parseFloat(r[totalIdx])   || 0;
-        const serial = String(r[serialIdx] || '').trim();
-        const date   = String(r[dateIdx]   || '').trim();
-
-        feeRows.push({ serial, name, subject: selectedSubject, paid, total, status: paid > 0 ? 'PAID' : 'DUE', month: sheetName, date, type: 'fee' });
+        const paid = parseFloat(r[subjectIdx]) || 0;
+        const total = parseFloat(r[totalIdx]) || 0;
+        feeRows.push({
+          serial: String(r[serialIdx] || '').trim(),
+          name, subject: selectedSubject, paid, total,
+          status: paid > 0 ? 'PAID' : 'DUE',
+          month: sheetName, date: String(r[dateIdx] || '').trim(),
+          type: 'fee'
+        });
       }
     }
   }
-  return { feeRows, mockRows, mockTitle: mtText };
+
+  return { feeRows, mockRows, mockTitle: mb?.titleText || '' };
 }
+
+// ─── ANALYZE ────────────────────────────────────────────────────────────
+document.getElementById('analyzeBtn').addEventListener('click', analyze);
 
 function analyze() {
   const btn = document.getElementById('analyzeBtn');
@@ -1072,15 +486,15 @@ function analyze() {
   btn.disabled = true;
 
   setTimeout(() => {
-    allData = []; mockData = []; mockTitle = '';
+    allData = []; mockDataRaw = []; mockTitle = '';
     selectedMonths.forEach(m => {
       const res = parseSheet(m);
       allData  = allData.concat(res.feeRows);
-      mockData = mockData.concat(res.mockRows);
+      mockDataRaw = mockDataRaw.concat(res.mockRows);
       if (res.mockTitle && !mockTitle) mockTitle = res.mockTitle;
     });
     allData.sort((a, b) => a.name.localeCompare(b.name));
-    mockData.sort((a, b) => a.name.localeCompare(b.name));
+    mockDataRaw.sort((a, b) => a.name.localeCompare(b.name));
 
     renderSummary();
     switchTab('paid');
@@ -1089,17 +503,24 @@ function analyze() {
 
     btn.innerHTML = 'Analyze Collection';
     btn.disabled = false;
-    const extra = mockData.length ? ` + ${mockData.length} mock row(s)` : '';
+    const mockFiltered = getFilteredMockRows();
+    const extra = mockFiltered.length ? ` + ${mockFiltered.length} mock payment(s)` : '';
     showToast(`✅ ${allData.length} fee students${extra} analyzed across ${selectedMonths.size} month(s)`);
   }, 200);
 }
 
+// Filter mock rows by selected months (already filtered during parse) + selected mock subjects
+function getFilteredMockRows() {
+  return mockDataRaw.filter(r => selectedMockSubjects.has(r.subject));
+}
+
 // ─── SUMMARY ───────────────────────────────────────────────────────────
 function renderSummary() {
-  const due   = allData.filter(r => r.status === 'DUE');
-  const paid  = allData.filter(r => r.status === 'PAID');
-  const total = paid.reduce((s, r) => s + r.paid, 0);
-  const mockTotal = mockData.reduce((s, r) => s + r.paid, 0);
+  const due  = allData.filter(r => r.status === 'DUE');
+  const paid = allData.filter(r => r.status === 'PAID');
+  const feeTotal  = paid.reduce((s, r) => s + r.paid, 0);
+  const mockRows  = getFilteredMockRows();
+  const mockTotal = mockRows.reduce((s, r) => s + r.paid, 0);
 
   const months = [...selectedMonths];
   const summaries = months.map(m => ({
@@ -1114,8 +535,8 @@ function renderSummary() {
       <div class="stat-value teal">${allData.length}</div>
     </div>
     <div class="stat-card green">
-      <div class="stat-label">${selectedSubject} Collected</div>
-      <div class="stat-value green">${fmtBDT(total)}</div>
+      <div class="stat-label">${selectedSubject} Fees Collected</div>
+      <div class="stat-value green">${fmtBDT(feeTotal)}</div>
     </div>
     <div class="stat-card green">
       <div class="stat-label">Paid Students</div>
@@ -1127,17 +548,15 @@ function renderSummary() {
     </div>
   `;
 
-  // Mock collected card (only when a mock block was detected)
-  if (mockData.length) {
+  if (mockRows.length) {
     html += `
       <div class="stat-card amber">
-        <div class="stat-label">Mock Collected</div>
+        <div class="stat-label">Mock Collected (${selectedMockSubjects.size} subj.)</div>
         <div class="stat-value amber">${fmtBDT(mockTotal)}</div>
       </div>
     `;
   }
 
-  // Per-month breakdown if >1 month
   if (months.length > 1) {
     summaries.forEach(s => {
       html += `
@@ -1149,11 +568,10 @@ function renderSummary() {
         </div>`;
     });
   }
-
   document.getElementById('summaryGrid').innerHTML = html;
 }
 
-// ─── TABS ───────────────────────────────────────────────────────────────
+// ─── TABS / TABLE ───────────────────────────────────────────────────────
 function switchTab(tab) {
   currentTab = tab;
   ['due','paid','all'].forEach(t => {
@@ -1164,26 +582,19 @@ function switchTab(tab) {
   renderTable(allData);
 }
 
-// ─── TABLE ──────────────────────────────────────────────────────────────
 function renderTable(data) {
   const search = document.getElementById('searchInput').value.toLowerCase();
   let rows = data;
-
   if (currentTab === 'due')  rows = rows.filter(r => r.status === 'DUE');
   if (currentTab === 'paid') rows = rows.filter(r => r.status === 'PAID');
-  if (search) rows = rows.filter(r =>
-    r.name.toLowerCase().includes(search) ||
-    r.serial.toLowerCase().includes(search)
-  );
+  if (search) rows = rows.filter(r => r.name.toLowerCase().includes(search) || r.serial.toLowerCase().includes(search));
 
   currentRows = rows;
   const multi = selectedMonths.size > 1;
 
   document.getElementById('tableHead').innerHTML = `
     <tr>
-      <th>#</th>
-      <th>Serial No.</th>
-      <th>Student Name</th>
+      <th>#</th><th>Serial No.</th><th>Student Name</th>
       ${multi ? '<th>Month</th>' : ''}
       <th style="text-align:right">${selectedSubject} (BDT)</th>
       <th>Status</th>
@@ -1212,11 +623,11 @@ function renderTable(data) {
 
 function filterTable() { renderTable(allData); }
 
-// ─── PDF EXPORT (Fees section + separate Mock section) ──────────────────
+// ─── PDF EXPORT ─────────────────────────────────────────────────────────
 function exportPDF() {
   const paidRows = allData.filter(r => r.status === 'PAID');
-  const mockRows = mockData.filter(r => r.paid > 0);
-  if (!paidRows.length && !mockRows.length) { showToast('No paid fees found — nothing to export.'); return; }
+  const mockRows = getFilteredMockRows();
+  if (!paidRows.length && !mockRows.length) { showToast('❌ No paid fees/mock rows to export.'); return; }
 
   const { jsPDF } = window.jspdf;
   const doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
@@ -1227,37 +638,31 @@ function exportPDF() {
   const feeTotal  = paidRows.reduce((s, r) => s + r.paid, 0);
   const mockTotal = mockRows.reduce((s, r) => s + r.paid, 0);
   const multi = selectedMonths.size > 1;
+  const mockSubjList = [...selectedMockSubjects].join(', ') || '—';
 
-  // Shared page footer
   const footer = data => {
     const ph = doc.internal.pageSize.height;
-    doc.setFontSize(8);
-    doc.setTextColor(150);
-    doc.setFont('helvetica','normal');
+    doc.setFontSize(8); doc.setTextColor(150); doc.setFont('helvetica','normal');
     doc.text('IBC Fee Analyzer  •  Confidential', 10, ph - 8);
     doc.text(`Page ${data.pageNumber}`, 200, ph - 8, { align: 'right' });
   };
+  const ensureSpace = (y, need) => { if (y > PAGE_H - need) { doc.addPage(); return 20; } return y; };
 
-  const ensureSpace = (y, need) => {
-    if (y > PAGE_H - need) { doc.addPage(); return 20; }
-    return y;
-  };
-
-  // ── Main header block
-  doc.setFillColor(13, 92, 99);
-  doc.rect(0, 0, 210, 38, 'F');
-  doc.setFont('helvetica','bold');
-  doc.setFontSize(18);
-  doc.setTextColor(255,255,255);
+  // Main header
+  doc.setFillColor(13, 92, 99); doc.rect(0, 0, 210, 38, 'F');
+  doc.setFont('helvetica','bold'); doc.setFontSize(18); doc.setTextColor(255,255,255);
   doc.text('IBC — Fee Collection List', 15, 16);
-  doc.setFontSize(10);
-  doc.setFont('helvetica','normal');
-  doc.text(`Subject: ${selectedSubject}   |   Month(s): ${months}   |   Generated: ${today}`, 15, 25);
-  doc.text(`Fees Collected: BDT ${fmtBDT(feeTotal)} (${paidRows.length})   |   Mock Collected: BDT ${fmtBDT(mockTotal)} (${mockRows.length})`, 15, 32);
-
+  doc.setFontSize(10); doc.setFont('helvetica','normal');
+  doc.text(`Fee Subject: ${selectedSubject}   |   Month(s): ${months}   |   Generated: ${today}`, 15, 25);
+  if (mockRows.length) {
+    doc.text(`Mock Subject(s): ${mockSubjList}`, 15, 30);
+    doc.text(`Fees: BDT ${fmtBDT(feeTotal)} (${paidRows.length})   |   Mock: BDT ${fmtBDT(mockTotal)} (${mockRows.length})`, 15, 35);
+  } else {
+    doc.text(`Fees Collected: BDT ${fmtBDT(feeTotal)} (${paidRows.length} students)`, 15, 30);
+  }
   let y = 46;
 
-  // ═════════ SECTION 1 — FEES COLLECTION ═════════
+  // ═══════ SECTION 1 — FEES ═══════
   if (paidRows.length) {
     doc.setFillColor(13, 92, 99); doc.rect(10, y - 4, 190, 8, 'F');
     doc.setFont('helvetica','bold'); doc.setFontSize(10); doc.setTextColor(255,255,255);
@@ -1265,11 +670,10 @@ function exportPDF() {
     y += 8;
 
     const byMonth = {};
-    paidRows.forEach(r => { if (!byMonth[r.month]) byMonth[r.month] = []; byMonth[r.month].push(r); });
+    paidRows.forEach(r => { (byMonth[r.month] = byMonth[r.month] || []).push(r); });
 
     Object.entries(byMonth).forEach(([month, rows]) => {
       const monthTotal = rows.reduce((s, r) => s + r.paid, 0);
-
       if (multi) {
         y = ensureSpace(y, 40);
         doc.setFillColor(230, 244, 245); doc.rect(10, y - 4, 190, 8, 'F');
@@ -1277,17 +681,14 @@ function exportPDF() {
         doc.text(`${month}  —  ${rows.length} students  |  Collected: BDT ${fmtBDT(monthTotal)}`, 14, y + 1);
         y += 8;
       }
-
-      const tableData = rows
-        .sort((a,b) => a.name.localeCompare(b.name))
+      const tableData = rows.sort((a,b) => a.name.localeCompare(b.name))
         .map((r, i) => [i + 1, r.serial, r.name, fmtBDT(r.paid)]);
 
       doc.autoTable({
         startY: y,
         head: [[ '#', 'Serial No.', 'Student Name', `${selectedSubject} Paid (BDT)` ]],
         body: tableData,
-        theme: 'grid',
-        margin: { left: 10, right: 10 },
+        theme: 'grid', margin: { left: 10, right: 10 },
         headStyles: { fillColor: [13, 92, 99], textColor: 255, fontStyle: 'bold', fontSize: 9 },
         bodyStyles: { fontSize: 9, textColor: [26,26,26] },
         alternateRowStyles: { fillColor: [246, 251, 251] },
@@ -1301,7 +702,6 @@ function exportPDF() {
         footStyles: { fillColor: [13, 92, 99], textColor: 255, fontStyle: 'bold', fontSize: 9, halign: 'right' },
         didDrawPage: footer,
       });
-
       y = doc.lastAutoTable.finalY + 10;
     });
 
@@ -1312,34 +712,29 @@ function exportPDF() {
     y += 12;
   }
 
-  // ═════════ SECTION 2 — MOCK COLLECTION (only if a mock block exists) ═════════
+  // ═══════ SECTION 2 — MOCK COLLECTION (only if filtered rows exist) ═══════
   if (mockRows.length) {
     doc.addPage();
-
-    // Amber banner like the Excel mock block title
     doc.setFillColor(232, 160, 32); doc.rect(0, 0, 210, 30, 'F');
     doc.setFont('helvetica','bold'); doc.setFontSize(16); doc.setTextColor(26,26,26);
     doc.text(mockTitle || 'Mock Collection', 15, 12);
     doc.setFontSize(10); doc.setFont('helvetica','normal');
-    doc.text(`Month(s): ${months}   |   Generated: ${today}`, 15, 20);
+    doc.text(`Month(s): ${months}   |   Subject(s): ${mockSubjList}   |   Generated: ${today}`, 15, 20);
     doc.text(`Total Mock Payments: ${mockRows.length}   |   Total Collected: BDT ${fmtBDT(mockTotal)}`, 15, 26);
 
     let my = 38;
-
     const bySubj = {};
-    mockRows.forEach(r => { if (!bySubj[r.subject]) bySubj[r.subject] = []; bySubj[r.subject].push(r); });
+    mockRows.forEach(r => { (bySubj[r.subject] = bySubj[r.subject] || []).push(r); });
 
     Object.entries(bySubj).forEach(([subj, rows]) => {
       const subjTotal = rows.reduce((s, r) => s + r.paid, 0);
-
       my = ensureSpace(my, 40);
       doc.setFillColor(254, 243, 220); doc.rect(10, my - 4, 190, 8, 'F');
       doc.setFont('helvetica','bold'); doc.setFontSize(10); doc.setTextColor(148, 104, 20);
       doc.text(`${subj}  —  ${rows.length} student(s)  |  Collected: BDT ${fmtBDT(subjTotal)}`, 14, my + 1);
       my += 8;
 
-      const tableData = rows
-        .sort((a,b) => a.name.localeCompare(b.name))
+      const tableData = rows.sort((a,b) => a.name.localeCompare(b.name))
         .map((r, i) => multi ? [i + 1, r.serial, r.name, r.month, fmtBDT(r.paid)] : [i + 1, r.serial, r.name, fmtBDT(r.paid)]);
 
       doc.autoTable({
@@ -1348,21 +743,17 @@ function exportPDF() {
           ? [[ '#', 'Serial No.', 'Student Name', 'Month', `${subj} (BDT)` ]]
           : [[ '#', 'Serial No.', 'Student Name', `${subj} (BDT)` ]],
         body: tableData,
-        theme: 'grid',
-        margin: { left: 10, right: 10 },
+        theme: 'grid', margin: { left: 10, right: 10 },
         headStyles: { fillColor: [232, 160, 32], textColor: 255, fontStyle: 'bold', fontSize: 9 },
         bodyStyles: { fontSize: 9, textColor: [26,26,26] },
         alternateRowStyles: { fillColor: [255, 250, 240] },
         columnStyles: multi
           ? { 0:{cellWidth:10,align:'center'}, 1:{cellWidth:28,font:'courier'}, 2:{cellWidth:'auto'}, 3:{cellWidth:22}, 4:{cellWidth:32,align:'right',textColor:[148,104,20],fontStyle:'bold'} }
           : { 0:{cellWidth:10,align:'center'}, 1:{cellWidth:30,font:'courier'}, 2:{cellWidth:'auto'}, 3:{cellWidth:35,align:'right',textColor:[148,104,20],fontStyle:'bold'} },
-        foot: multi
-          ? [['', '', '', 'TOTAL', `BDT ${fmtBDT(subjTotal)}`]]
-          : [['', '', 'TOTAL', `BDT ${fmtBDT(subjTotal)}`]],
+        foot: multi ? [['', '', '', 'TOTAL', `BDT ${fmtBDT(subjTotal)}`]] : [['', '', 'TOTAL', `BDT ${fmtBDT(subjTotal)}`]],
         footStyles: { fillColor: [232, 160, 32], textColor: 255, fontStyle: 'bold', fontSize: 9, halign: 'right' },
         didDrawPage: footer,
       });
-
       my = doc.lastAutoTable.finalY + 10;
     });
 
@@ -1386,20 +777,19 @@ function exportPDF() {
 }
 
 // ─── HELPERS ────────────────────────────────────────────────────────────
-function fmtBDT(n) {
-  return Number(n).toLocaleString('en-IN');
-}
+function fmtBDT(n) { return Number(n).toLocaleString('en-IN'); }
 
 function showToast(msg) {
   const t = document.getElementById('toast');
-  t.textContent = msg;
-  t.classList.add('show');
+  t.textContent = msg; t.classList.add('show');
   setTimeout(() => t.classList.remove('show'), 3500);
 }
 
 function resetApp() {
-  allData = []; mockData = []; mockTitle = '';
-  selectedMonths.clear(); selectedSubject = ''; workbook = null;
+  allData = []; mockDataRaw = []; mockTitle = '';
+  selectedMonths.clear(); selectedSubject = '';
+  selectedMockSubjects.clear(); availableMockSubjects = [];
+  workbook = null;
   document.getElementById('resultsSection').classList.add('hidden');
   document.getElementById('configSection').classList.add('hidden');
   document.getElementById('fileName').classList.add('hidden');
@@ -1407,188 +797,5 @@ function resetApp() {
   window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 <\/script>
-</body>
-</html>
-</script>
-
-<script>
-// ─── Base64-encoded original app sources (unmodified) ───────────────────────
-const APP_SOURCES = {
-  app1: "PCFET0NUWVBFIGh0bWw+CjxodG1sIGxhbmc9ImVuIj4KPGhlYWQ+CiAgICA8bWV0YSBjaGFyc2V0PSJVVEYtOCI+CiAgICA8bWV0YSBuYW1lPSJ2aWV3cG9ydCIgY29udGVudD0id2lkdGg9ZGV2aWNlLXdpZHRoLCBpbml0aWFsLXNjYWxlPTEuMCI+CiAgICA8dGl0bGU+Q3VzdG9taXphYmxlIEV4YW0gQ2FsY3VsYXRvcjwvdGl0bGU+CiAgICA8c3R5bGU+CiAgICAgICAgYm9keSB7CiAgICAgICAgICAgIGZvbnQtZmFtaWx5OiBBcmlhbCwgc2Fucy1zZXJpZjsKICAgICAgICAgICAgbWF4LXdpZHRoOiA2NTBweDsKICAgICAgICAgICAgbWFyZ2luOiAwIGF1dG87CiAgICAgICAgICAgIHBhZGRpbmc6IDIwcHg7CiAgICAgICAgICAgIGxpbmUtaGVpZ2h0OiAxLjY7CiAgICAgICAgfQogICAgICAgIC5jb250YWluZXIgewogICAgICAgICAgICBiYWNrZ3JvdW5kLWNvbG9yOiAjZjlmOWY5OwogICAgICAgICAgICBwYWRkaW5nOiAyNXB4OwogICAgICAgICAgICBib3JkZXItcmFkaXVzOiAxMHB4OwogICAgICAgICAgICBib3gtc2hhZG93OiAwIDRweCA4cHggcmdiYSgwLDAsMCwwLjEpOwogICAgICAgIH0KICAgICAgICBoMSB7CiAgICAgICAgICAgIGNvbG9yOiAjMmMzZTUwOwogICAgICAgICAgICB0ZXh0LWFsaWduOiBjZW50ZXI7CiAgICAgICAgICAgIG1hcmdpbi1ib3R0b206IDEwcHg7CiAgICAgICAgfQogICAgICAgIC5zdWJ0aXRsZSB7CiAgICAgICAgICAgIHRleHQtYWxpZ246IGNlbnRlcjsKICAgICAgICAgICAgY29sb3I6ICM3ZjhjOGQ7CiAgICAgICAgICAgIGZvbnQtc2l6ZTogMC45ZW07CiAgICAgICAgICAgIG1hcmdpbi1ib3R0b206IDIwcHg7CiAgICAgICAgfQogICAgICAgIC5mb3JtLWdyb3VwIHsKICAgICAgICAgICAgbWFyZ2luLWJvdHRvbTogMTVweDsKICAgICAgICB9CiAgICAgICAgbGFiZWwgewogICAgICAgICAgICBkaXNwbGF5OiBibG9jazsKICAgICAgICAgICAgbWFyZ2luLWJvdHRvbTogNXB4OwogICAgICAgICAgICBmb250LXdlaWdodDogYm9sZDsKICAgICAgICAgICAgY29sb3I6ICMyYzNlNTA7CiAgICAgICAgfQogICAgICAgIGlucHV0IHsKICAgICAgICAgICAgd2lkdGg6IDEwMCU7CiAgICAgICAgICAgIHBhZGRpbmc6IDEwcHg7CiAgICAgICAgICAgIGJvcmRlcjogMXB4IHNvbGlkICNkZGQ7CiAgICAgICAgICAgIGJvcmRlci1yYWRpdXM6IDRweDsKICAgICAgICAgICAgYm94LXNpemluZzogYm9yZGVyLWJveDsKICAgICAgICAgICAgZm9udC1zaXplOiAxNnB4OwogICAgICAgIH0KICAgICAgICBidXR0b24gewogICAgICAgICAgICBiYWNrZ3JvdW5kLWNvbG9yOiAjMzQ5OGRiOwogICAgICAgICAgICBjb2xvcjogd2hpdGU7CiAgICAgICAgICAgIHBhZGRpbmc6IDEwcHggMTVweDsKICAgICAgICAgICAgYm9yZGVyOiBub25lOwogICAgICAgICAgICBib3JkZXItcmFkaXVzOiA0cHg7CiAgICAgICAgICAgIGN1cnNvcjogcG9pbnRlcjsKICAgICAgICAgICAgZm9udC1zaXplOiAxNnB4OwogICAgICAgICAgICBtYXJnaW4tdG9wOiA1cHg7CiAgICAgICAgfQogICAgICAgIGJ1dHRvbjpob3ZlciB7CiAgICAgICAgICAgIGJhY2tncm91bmQtY29sb3I6ICMyOTgwYjk7CiAgICAgICAgfQogICAgICAgIC5idG4tZ3JlZW4gewogICAgICAgICAgICBiYWNrZ3JvdW5kLWNvbG9yOiAjMmVjYzcxOwogICAgICAgIH0KICAgICAgICAuYnRuLWdyZWVuOmhvdmVyIHsKICAgICAgICAgICAgYmFja2dyb3VuZC1jb2xvcjogIzI3YWU2MDsKICAgICAgICB9CiAgICAgICAgLnJlc3VsdCB7CiAgICAgICAgICAgIG1hcmdpbi10b3A6IDIwcHg7CiAgICAgICAgICAgIHBhZGRpbmc6IDE1cHg7CiAgICAgICAgICAgIGJhY2tncm91bmQtY29sb3I6ICNlOGY0ZmM7CiAgICAgICAgICAgIGJvcmRlci1sZWZ0OiA2cHggc29saWQgIzM0OThkYjsKICAgICAgICAgICAgYm9yZGVyLXJhZGl1czogNHB4OwogICAgICAgICAgICBkaXNwbGF5OiBub25lOwogICAgICAgIH0KICAgICAgICAubW9kZS10b2dnbGUgewogICAgICAgICAgICBtYXJnaW46IDIwcHggMDsKICAgICAgICAgICAgdGV4dC1hbGlnbjogY2VudGVyOwogICAgICAgIH0KICAgICAgICAudG9nZ2xlLWJ1dHRvbiB7CiAgICAgICAgICAgIGJhY2tncm91bmQtY29sb3I6ICNmMGYwZjA7CiAgICAgICAgICAgIGNvbG9yOiAjMzMzOwogICAgICAgICAgICBib3JkZXI6IG5vbmU7CiAgICAgICAgICAgIHBhZGRpbmc6IDEycHggMThweDsKICAgICAgICAgICAgbWFyZ2luOiAwIDhweDsKICAgICAgICAgICAgY3Vyc29yOiBwb2ludGVyOwogICAgICAgICAgICBib3JkZXItcmFkaXVzOiA2cHg7CiAgICAgICAgICAgIGZvbnQtd2VpZ2h0OiBib2xkOwogICAgICAgICAgICBmb250LXNpemU6IDE1cHg7CiAgICAgICAgfQogICAgICAgIC50b2dnbGUtYnV0dG9uLmFjdGl2ZSB7CiAgICAgICAgICAgIGJhY2tncm91bmQtY29sb3I6ICMzNDk4ZGI7CiAgICAgICAgICAgIGNvbG9yOiB3aGl0ZTsKICAgICAgICB9CiAgICAgICAgLnNlY3Rpb24gewogICAgICAgICAgICBtYXJnaW4tYm90dG9tOiAyMHB4OwogICAgICAgICAgICBwYWRkaW5nOiAxNXB4OwogICAgICAgICAgICBiYWNrZ3JvdW5kLWNvbG9yOiAjZjVmNWY1OwogICAgICAgICAgICBib3JkZXItcmFkaXVzOiA2cHg7CiAgICAgICAgfQogICAgPC9zdHlsZT4KPC9oZWFkPgo8Ym9keT4KICAgIDxkaXYgY2xhc3M9ImNvbnRhaW5lciI+CiAgICAgICAgPGgxPvCfjq8gRXhhbSBUaW1lL01hcmtzIENhbGN1bGF0b3I8L2gxPgogICAgICAgIDxwIGNsYXNzPSJzdWJ0aXRsZSI+U2V0IHlvdXIgcmVmZXJlbmNlIGV4YW0gYW5kIGNhbGN1bGF0ZSB0aW1lIG9yIG1hcmtzIGFjY29yZGluZ2x5PC9wPgoKICAgICAgICA8IS0tIFNlY3Rpb24gMTogU2V0IFJlZmVyZW5jZSBFeGFtIC0tPgogICAgICAgIDxkaXYgY2xhc3M9InNlY3Rpb24iPgogICAgICAgICAgICA8aDI+8J+TnSBTZXQgUmVmZXJlbmNlIEV4YW08L2gyPgogICAgICAgICAgICA8ZGl2IGNsYXNzPSJmb3JtLWdyb3VwIj4KICAgICAgICAgICAgICAgIDxsYWJlbCBmb3I9InJlZk1hcmtzIj5Ub3RhbCBNYXJrczo8L2xhYmVsPgogICAgICAgICAgICAgICAgPGlucHV0IHR5cGU9Im51bWJlciIgaWQ9InJlZk1hcmtzIiBwbGFjZWhvbGRlcj0iZS5nLiAxMTAiIHZhbHVlPSIxMTAiPgogICAgICAgICAgICA8L2Rpdj4KICAgICAgICAgICAgPGRpdiBjbGFzcz0iZm9ybS1ncm91cCI+CiAgICAgICAgICAgICAgICA8bGFiZWwgZm9yPSJyZWZUaW1lIj5Ub3RhbCBUaW1lIChtaW51dGVzKTo8L2xhYmVsPgogICAgICAgICAgICAgICAgPGlucHV0IHR5cGU9Im51bWJlciIgaWQ9InJlZlRpbWUiIHBsYWNlaG9sZGVyPSJlLmcuIDEyMCIgdmFsdWU9IjEyMCI+CiAgICAgICAgICAgIDwvZGl2PgogICAgICAgICAgICA8YnV0dG9uIG9uY2xpY2s9InVwZGF0ZVJlZmVyZW5jZSgpIj5VcGRhdGUgUmVmZXJlbmNlPC9idXR0b24+CiAgICAgICAgICAgIDxwPjxzbWFsbCBpZD0icmVmRGlzcGxheSI+Q3VycmVudDogMTEwIG1hcmtzID0gMTIwIG1pbnV0ZXM8L3NtYWxsPjwvcD4KICAgICAgICA8L2Rpdj4KCiAgICAgICAgPCEtLSBTZWN0aW9uIDI6IE1vZGUgVG9nZ2xlIC0tPgogICAgICAgIDxkaXYgY2xhc3M9Im1vZGUtdG9nZ2xlIj4KICAgICAgICAgICAgPGJ1dHRvbiBpZD0idGltZU1vZGVCdG4iIGNsYXNzPSJ0b2dnbGUtYnV0dG9uIGFjdGl2ZSIgb25jbGljaz0ic3dpdGNoTW9kZSgndGltZScpIj4KICAgICAgICAgICAgICAgIPCflKIgTWFya3Mg4oaSIOKPse+4jyBUaW1lCiAgICAgICAgICAgIDwvYnV0dG9uPgogICAgICAgICAgICA8YnV0dG9uIGlkPSJtYXJrc01vZGVCdG4iIGNsYXNzPSJ0b2dnbGUtYnV0dG9uIiBvbmNsaWNrPSJzd2l0Y2hNb2RlKCdtYXJrcycpIj4KICAgICAgICAgICAgICAgIOKPse+4jyBUaW1lIOKGkiDwn5SiIE1hcmtzCiAgICAgICAgICAgIDwvYnV0dG9uPgogICAgICAgIDwvZGl2PgoKICAgICAgICA8IS0tIFNlY3Rpb24gMzogSW5wdXQgJiBDYWxjdWxhdGlvbiAtLT4KICAgICAgICA8ZGl2IGNsYXNzPSJmb3JtLWdyb3VwIj4KICAgICAgICAgICAgPGxhYmVsIGlkPSJpbnB1dExhYmVsIiBmb3I9ImlucHV0VmFsdWUiPkVudGVyIFRlc3QgTWFya3M6PC9sYWJlbD4KICAgICAgICAgICAgPGlucHV0IHR5cGU9Im51bWJlciIgaWQ9ImlucHV0VmFsdWUiIHBsYWNlaG9sZGVyPSJFbnRlciB2YWx1ZS4uLiIgdmFsdWU9IjMwIj4KICAgICAgICA8L2Rpdj4KCiAgICAgICAgPGJ1dHRvbiBjbGFzcz0iYnRuLWdyZWVuIiBvbmNsaWNrPSJjYWxjdWxhdGUoKSI+8J+TiiBDYWxjdWxhdGU8L2J1dHRvbj4KCiAgICAgICAgPCEtLSBSZXN1bHQgRGlzcGxheSAtLT4KICAgICAgICA8ZGl2IGlkPSJyZXN1bHQiIGNsYXNzPSJyZXN1bHQiPjwvZGl2PgogICAgPC9kaXY+CgogICAgPHNjcmlwdD4KICAgICAgICAvLyBEZWZhdWx0IHJlZmVyZW5jZSBleGFtCiAgICAgICAgbGV0IHJlZmVyZW5jZU1hcmtzID0gMTEwOwogICAgICAgIGxldCByZWZlcmVuY2VUaW1lTWludXRlcyA9IDEyMDsKICAgICAgICBsZXQgdGltZVBlck1hcmsgPSByZWZlcmVuY2VUaW1lTWludXRlcyAvIHJlZmVyZW5jZU1hcmtzOwogICAgICAgIGxldCBjdXJyZW50TW9kZSA9ICd0aW1lJzsgLy8gJ3RpbWUnIG9yICdtYXJrcycKCiAgICAgICAgLy8gVXBkYXRlIHJlZmVyZW5jZSB2YWx1ZXMgZnJvbSB1c2VyIGlucHV0CiAgICAgICAgZnVuY3Rpb24gdXBkYXRlUmVmZXJlbmNlKCkgewogICAgICAgICAgICBjb25zdCByZWZNYXJrc0lucHV0ID0gcGFyc2VGbG9hdChkb2N1bWVudC5nZXRFbGVtZW50QnlJZCgncmVmTWFya3MnKS52YWx1ZSk7CiAgICAgICAgICAgIGNvbnN0IHJlZlRpbWVJbnB1dCA9IHBhcnNlRmxvYXQoZG9jdW1lbnQuZ2V0RWxlbWVudEJ5SWQoJ3JlZlRpbWUnKS52YWx1ZSk7CiAgICAgICAgICAgIAogICAgICAgICAgICBpZiAoaXNOYU4ocmVmTWFya3NJbnB1dCkgfHwgcmVmTWFya3NJbnB1dCA8PSAwKSB7CiAgICAgICAgICAgICAgICBhbGVydCgiUGxlYXNlIGVudGVyIGEgdmFsaWQgcG9zaXRpdmUgbnVtYmVyIGZvciByZWZlcmVuY2UgbWFya3MuIik7CiAgICAgICAgICAgICAgICByZXR1cm47CiAgICAgICAgICAgIH0KICAgICAgICAgICAgaWYgKGlzTmFOKHJlZlRpbWVJbnB1dCkgfHwgcmVmVGltZUlucHV0IDw9IDApIHsKICAgICAgICAgICAgICAgIGFsZXJ0KCJQbGVhc2UgZW50ZXIgYSB2YWxpZCBwb3NpdGl2ZSBudW1iZXIgZm9yIHJlZmVyZW5jZSB0aW1lLiIpOwogICAgICAgICAgICAgICAgcmV0dXJuOwogICAgICAgICAgICB9CgogICAgICAgICAgICByZWZlcmVuY2VNYXJrcyA9IHJlZk1hcmtzSW5wdXQ7CiAgICAgICAgICAgIHJlZmVyZW5jZVRpbWVNaW51dGVzID0gcmVmVGltZUlucHV0OwogICAgICAgICAgICB0aW1lUGVyTWFyayA9IHJlZmVyZW5jZVRpbWVNaW51dGVzIC8gcmVmZXJlbmNlTWFya3M7CgogICAgICAgICAgICAvLyBVcGRhdGUgZGlzcGxheQogICAgICAgICAgICBkb2N1bWVudC5nZXRFbGVtZW50QnlJZCgncmVmRGlzcGxheScpLnRleHRDb250ZW50ID0gCiAgICAgICAgICAgICAgICBgQ3VycmVudDogJHtyZWZlcmVuY2VNYXJrc30gbWFya3MgPSAke3JlZmVyZW5jZVRpbWVNaW51dGVzfSBtaW51dGVzYDsKICAgICAgICAgICAgCiAgICAgICAgICAgIC8vIEhpZGUgb2xkIHJlc3VsdAogICAgICAgICAgICBkb2N1bWVudC5nZXRFbGVtZW50QnlJZCgncmVzdWx0Jykuc3R5bGUuZGlzcGxheSA9ICJub25lIjsKICAgICAgICAgICAgCiAgICAgICAgICAgIC8vIE9wdGlvbmFsOiByZS1jYWxjdWxhdGUgaWYgYWxyZWFkeSBoYWQgaW5wdXQKICAgICAgICAgICAgaWYgKCFpc05hTihwYXJzZUZsb2F0KGRvY3VtZW50LmdldEVsZW1lbnRCeUlkKCdpbnB1dFZhbHVlJykudmFsdWUpKSkgewogICAgICAgICAgICAgICAgY2FsY3VsYXRlKCk7CiAgICAgICAgICAgIH0KICAgICAgICB9CgogICAgICAgIC8vIFN3aXRjaCBiZXR3ZWVuIGNhbGN1bGF0aW9uIG1vZGVzCiAgICAgICAgZnVuY3Rpb24gc3dpdGNoTW9kZShtb2RlKSB7CiAgICAgICAgICAgIGN1cnJlbnRNb2RlID0gbW9kZTsKICAgICAgICAgICAgY29uc3QgbGFiZWwgPSBkb2N1bWVudC5nZXRFbGVtZW50QnlJZCgnaW5wdXRMYWJlbCcpOwogICAgICAgICAgICBjb25zdCBpbnB1dFZhbHVlID0gZG9jdW1lbnQuZ2V0RWxlbWVudEJ5SWQoJ2lucHV0VmFsdWUnKTsKICAgICAgICAgICAgY29uc3QgdGltZUJ0biA9IGRvY3VtZW50LmdldEVsZW1lbnRCeUlkKCd0aW1lTW9kZUJ0bicpOwogICAgICAgICAgICBjb25zdCBtYXJrc0J0biA9IGRvY3VtZW50LmdldEVsZW1lbnRCeUlkKCdtYXJrc01vZGVCdG4nKTsKCiAgICAgICAgICAgIGlmIChtb2RlID09PSAndGltZScpIHsKICAgICAgICAgICAgICAgIGxhYmVsLnRleHRDb250ZW50ID0gIkVudGVyIFRlc3QgTWFya3M6IjsKICAgICAgICAgICAgICAgIGlucHV0VmFsdWUucGxhY2Vob2xkZXIgPSAiZS5nLiAzMCI7CiAgICAgICAgICAgICAgICB0aW1lQnRuLmNsYXNzTGlzdC5hZGQoJ2FjdGl2ZScpOwogICAgICAgICAgICAgICAgbWFya3NCdG4uY2xhc3NMaXN0LnJlbW92ZSgnYWN0aXZlJyk7CiAgICAgICAgICAgIH0gZWxzZSB7CiAgICAgICAgICAgICAgICBsYWJlbC50ZXh0Q29udGVudCA9ICJFbnRlciBUaW1lIEF2YWlsYWJsZSAobWludXRlcyk6IjsKICAgICAgICAgICAgICAgIGlucHV0VmFsdWUucGxhY2Vob2xkZXIgPSAiZS5nLiA0NSI7CiAgICAgICAgICAgICAgICBtYXJrc0J0bi5jbGFzc0xpc3QuYWRkKCdhY3RpdmUnKTsKICAgICAgICAgICAgICAgIHRpbWVCdG4uY2xhc3NMaXN0LnJlbW92ZSgnYWN0aXZlJyk7CiAgICAgICAgICAgIH0KCiAgICAgICAgICAgIGRvY3VtZW50LmdldEVsZW1lbnRCeUlkKCdyZXN1bHQnKS5zdHlsZS5kaXNwbGF5ID0gIm5vbmUiOwogICAgICAgIH0KCiAgICAgICAgLy8gUGVyZm9ybSBjYWxjdWxhdGlvbgogICAgICAgIGZ1bmN0aW9uIGNhbGN1bGF0ZSgpIHsKICAgICAgICAgICAgY29uc3QgaW5wdXRWYWwgPSBwYXJzZUZsb2F0KGRvY3VtZW50LmdldEVsZW1lbnRCeUlkKCdpbnB1dFZhbHVlJykudmFsdWUpOwogICAgICAgICAgICBjb25zdCByZXN1bHRFbGVtZW50ID0gZG9jdW1lbnQuZ2V0RWxlbWVudEJ5SWQoJ3Jlc3VsdCcpOwoKICAgICAgICAgICAgaWYgKGlzTmFOKGlucHV0VmFsKSB8fCBpbnB1dFZhbCA8PSAwKSB7CiAgICAgICAgICAgICAgICByZXN1bHRFbGVtZW50LmlubmVySFRNTCA9ICLimqDvuI8gUGxlYXNlIGVudGVyIGEgdmFsaWQgcG9zaXRpdmUgbnVtYmVyLiI7CiAgICAgICAgICAgICAgICByZXN1bHRFbGVtZW50LnN0eWxlLmRpc3BsYXkgPSAiYmxvY2siOwogICAgICAgICAgICAgICAgcmV0dXJuOwogICAgICAgICAgICB9CgogICAgICAgICAgICBsZXQgcmVzdWx0VGV4dCA9ICcnOwoKICAgICAgICAgICAgaWYgKGN1cnJlbnRNb2RlID09PSAndGltZScpIHsKICAgICAgICAgICAgICAgIC8vIE1hcmtzIOKGkiBUaW1lCiAgICAgICAgICAgICAgICBjb25zdCByZXF1aXJlZFRpbWUgPSBpbnB1dFZhbCAqIHRpbWVQZXJNYXJrOwogICAgICAgICAgICAgICAgY29uc3QgbWlucyA9IE1hdGguZmxvb3IocmVxdWlyZWRUaW1lKTsKICAgICAgICAgICAgICAgIGNvbnN0IHNlY3MgPSBNYXRoLnJvdW5kKChyZXF1aXJlZFRpbWUgLSBtaW5zKSAqIDYwKTsKCiAgICAgICAgICAgICAgICByZXN1bHRUZXh0ID0gYAogICAgICAgICAgICAgICAgICAgIDxzdHJvbmc+4o+x77iPIFRpbWUgUmVxdWlyZWQgZm9yICR7aW5wdXRWYWx9IE1hcmtzOjwvc3Ryb25nPjxicj48YnI+CiAgICAgICAgICAgICAgICAgICAg4oCiIFRpbWUgcGVyIG1hcms6IDxzdHJvbmc+JHt0aW1lUGVyTWFyay50b0ZpeGVkKDMpfSBtaW48L3N0cm9uZz48YnI+CiAgICAgICAgICAgICAgICAgICAg4oCiIFRvdGFsIHRpbWU6IDxzdHJvbmc+JHtyZXF1aXJlZFRpbWUudG9GaXhlZCgyKX0gbWludXRlczwvc3Ryb25nPjxicj4KICAgICAgICAgICAgICAgICAgICDigKIg4omIIDxzdHJvbmc+JHttaW5zfSBtaW51dGUke21pbnMgIT09IDEgPyAncycgOiAnJ30gCiAgICAgICAgICAgICAgICAgICAgICAgJHtzZWNzfSBzZWNvbmQke3NlY3MgIT09IDEgPyAncycgOiAnJ308L3N0cm9uZz48YnI+PGJyPgogICAgICAgICAgICAgICAgICAgIEJhc2VkIG9uOiAke3JlZmVyZW5jZU1hcmtzfSBtYXJrcyA9ICR7cmVmZXJlbmNlVGltZU1pbnV0ZXN9IG1pbnV0ZXMKICAgICAgICAgICAgICAgIGA7CiAgICAgICAgICAgIH0gZWxzZSB7CiAgICAgICAgICAgICAgICAvLyBUaW1lIOKGkiBNYXJrcwogICAgICAgICAgICAgICAgY29uc3QgcG9zc2libGVNYXJrcyA9IGlucHV0VmFsIC8gdGltZVBlck1hcms7CiAgICAgICAgICAgICAgICBjb25zdCB3aG9sZU1hcmtzID0gTWF0aC5mbG9vcihwb3NzaWJsZU1hcmtzKTsKICAgICAgICAgICAgICAgIGNvbnN0IGZyYWN0aW9uYWwgPSAocG9zc2libGVNYXJrcyAtIHdob2xlTWFya3MpLnRvRml4ZWQoMik7CgogICAgICAgICAgICAgICAgcmVzdWx0VGV4dCA9IGAKICAgICAgICAgICAgICAgICAgICA8c3Ryb25nPvCfk50gTWFya3MgUG9zc2libGUgaW4gJHtpbnB1dFZhbH0gTWludXRlczo8L3N0cm9uZz48YnI+PGJyPgogICAgICAgICAgICAgICAgICAgIOKAoiBUaW1lIHBlciBtYXJrOiA8c3Ryb25nPiR7dGltZVBlck1hcmsudG9GaXhlZCgzKX0gbWluPC9zdHJvbmc+PGJyPgogICAgICAgICAgICAgICAgICAgIOKAoiBFc3RpbWF0ZWQgbWFya3M6IDxzdHJvbmc+JHtwb3NzaWJsZU1hcmtzLnRvRml4ZWQoMil9PC9zdHJvbmc+PGJyPgogICAgICAgICAgICAgICAgICAgIOKAoiBGdWxsIHF1ZXN0aW9uczogPHN0cm9uZz4ke3dob2xlTWFya3N9PC9zdHJvbmc+ICh3aXRoIAogICAgICAgICAgICAgICAgICAgICAgIDxzdHJvbmc+JHsoaW5wdXRWYWwgLSB3aG9sZU1hcmtzICogdGltZVBlck1hcmspLnRvRml4ZWQoMSl9IG1pbjwvc3Ryb25nPiBsZWZ0KTxicj48YnI+CiAgICAgICAgICAgICAgICAgICAgQmFzZWQgb246ICR7cmVmZXJlbmNlTWFya3N9IG1hcmtzID0gJHtyZWZlcmVuY2VUaW1lTWludXRlc30gbWludXRlcwogICAgICAgICAgICAgICAgYDsKICAgICAgICAgICAgfQoKICAgICAgICAgICAgcmVzdWx0RWxlbWVudC5pbm5lckhUTUwgPSByZXN1bHRUZXh0OwogICAgICAgICAgICByZXN1bHRFbGVtZW50LnN0eWxlLmRpc3BsYXkgPSAiYmxvY2siOwogICAgICAgIH0KCiAgICAgICAgLy8gQWxsb3cgRW50ZXIga2V5IHRvIHRyaWdnZXIgYWN0aW9ucwogICAgICAgIGRvY3VtZW50LmdldEVsZW1lbnRCeUlkKCdyZWZNYXJrcycpLmFkZEV2ZW50TGlzdGVuZXIoJ2tleXByZXNzJywgZnVuY3Rpb24oZSkgewogICAgICAgICAgICBpZiAoZS5rZXkgPT09ICdFbnRlcicpIHVwZGF0ZVJlZmVyZW5jZSgpOwogICAgICAgIH0pOwogICAgICAgIGRvY3VtZW50LmdldEVsZW1lbnRCeUlkKCdyZWZUaW1lJykuYWRkRXZlbnRMaXN0ZW5lcigna2V5cHJlc3MnLCBmdW5jdGlvbihlKSB7CiAgICAgICAgICAgIGlmIChlLmtleSA9PT0gJ0VudGVyJykgdXBkYXRlUmVmZXJlbmNlKCk7CiAgICAgICAgfSk7CiAgICAgICAgZG9jdW1lbnQuZ2V0RWxlbWVudEJ5SWQoJ2lucHV0VmFsdWUnKS5hZGRFdmVudExpc3RlbmVyKCdrZXlwcmVzcycsIGZ1bmN0aW9uKGUpIHsKICAgICAgICAgICAgaWYgKGUua2V5ID09PSAnRW50ZXInKSBjYWxjdWxhdGUoKTsKICAgICAgICB9KTsKICAgIDwvc2NyaXB0Pgo8L2JvZHk+CjwvaHRtbD4K",
-  app3: "PCFET0NUWVBFIGh0bWw+CjxodG1sIGxhbmc9ImVuIj4KPGhlYWQ+CjxtZXRhIGNoYXJzZXQ9IlVURi04Ij4KPHRpdGxlPlNSVCBUaW1lc3RhbXAgU2hpZnRlcjwvdGl0bGU+CjxzdHlsZT4KICAqIHsgYm94LXNpemluZzogYm9yZGVyLWJveDsgbWFyZ2luOiAwOyBwYWRkaW5nOiAwOyB9CiAgYm9keSB7CiAgICBmb250LWZhbWlseTogLWFwcGxlLXN5c3RlbSwgQmxpbmtNYWNTeXN0ZW1Gb250LCAiU2Vnb2UgVUkiLCBzYW5zLXNlcmlmOwogICAgYmFja2dyb3VuZDogbGluZWFyLWdyYWRpZW50KDEzNWRlZywgIzFhMWEyZSAwJSwgIzE2MjEzZSAxMDAlKTsKICAgIGNvbG9yOiAjZTRlNGU3OwogICAgbWluLWhlaWdodDogMTAwdmg7CiAgICBwYWRkaW5nOiAyNHB4OwogIH0KICAuY29udGFpbmVyIHsKICAgIG1heC13aWR0aDogOTAwcHg7CiAgICBtYXJnaW46IDAgYXV0bzsKICAgIGJhY2tncm91bmQ6ICMwZjE3MmE7CiAgICBib3JkZXItcmFkaXVzOiAxNnB4OwogICAgcGFkZGluZzogMzJweDsKICAgIGJveC1zaGFkb3c6IDAgMjBweCA2MHB4IHJnYmEoMCwwLDAsMC41KTsKICB9CiAgaDEgewogICAgZm9udC1zaXplOiAyOHB4OwogICAgbWFyZ2luLWJvdHRvbTogOHB4OwogICAgYmFja2dyb3VuZDogbGluZWFyLWdyYWRpZW50KDkwZGVnLCAjNjBhNWZhLCAjYTc4YmZhKTsKICAgIC13ZWJraXQtYmFja2dyb3VuZC1jbGlwOiB0ZXh0OwogICAgLXdlYmtpdC10ZXh0LWZpbGwtY29sb3I6IHRyYW5zcGFyZW50OwogIH0KICAuc3VidGl0bGUgeyBjb2xvcjogIzk0YTNiODsgbWFyZ2luLWJvdHRvbTogMjhweDsgZm9udC1zaXplOiAxNHB4OyB9CiAgLmRyb3Atem9uZSB7CiAgICBib3JkZXI6IDJweCBkYXNoZWQgIzMzNDE1NTsKICAgIGJvcmRlci1yYWRpdXM6IDEycHg7CiAgICBwYWRkaW5nOiA0MHB4OwogICAgdGV4dC1hbGlnbjogY2VudGVyOwogICAgY3Vyc29yOiBwb2ludGVyOwogICAgdHJhbnNpdGlvbjogYWxsIDAuMnM7CiAgICBtYXJnaW4tYm90dG9tOiAyMHB4OwogIH0KICAuZHJvcC16b25lOmhvdmVyLCAuZHJvcC16b25lLmRyYWdvdmVyIHsKICAgIGJvcmRlci1jb2xvcjogIzYwYTVmYTsKICAgIGJhY2tncm91bmQ6IHJnYmEoOTYsIDE2NSwgMjUwLCAwLjA1KTsKICB9CiAgLmRyb3Atem9uZSBwIHsgY29sb3I6ICM5NGEzYjg7IH0KICAuZHJvcC16b25lIC5pY29uIHsgZm9udC1zaXplOiA0MHB4OyBtYXJnaW4tYm90dG9tOiAxMnB4OyB9CiAgaW5wdXRbdHlwZT0iZmlsZSJdIHsgZGlzcGxheTogbm9uZTsgfQogIC5jb250cm9scyB7CiAgICBkaXNwbGF5OiBmbGV4OwogICAgZ2FwOiAxMnB4OwogICAgYWxpZ24taXRlbXM6IGNlbnRlcjsKICAgIGZsZXgtd3JhcDogd3JhcDsKICAgIG1hcmdpbi1ib3R0b206IDIwcHg7CiAgfQogIC5zaGlmdC1pbnB1dCB7CiAgICBkaXNwbGF5OiBmbGV4OwogICAgYWxpZ24taXRlbXM6IGNlbnRlcjsKICAgIGJhY2tncm91bmQ6ICMxZTI5M2I7CiAgICBib3JkZXItcmFkaXVzOiA4cHg7CiAgICBwYWRkaW5nOiA0cHg7CiAgfQogIC5zaGlmdC1pbnB1dCBidXR0b24gewogICAgYmFja2dyb3VuZDogIzMzNDE1NTsKICAgIGNvbG9yOiB3aGl0ZTsKICAgIGJvcmRlcjogbm9uZTsKICAgIHdpZHRoOiAzNnB4OwogICAgaGVpZ2h0OiAzNnB4OwogICAgYm9yZGVyLXJhZGl1czogNnB4OwogICAgY3Vyc29yOiBwb2ludGVyOwogICAgZm9udC1zaXplOiAxOHB4OwogICAgZm9udC13ZWlnaHQ6IGJvbGQ7CiAgfQogIC5zaGlmdC1pbnB1dCBidXR0b246aG92ZXIgeyBiYWNrZ3JvdW5kOiAjNDc1NTY5OyB9CiAgLnNoaWZ0LWlucHV0IGlucHV0IHsKICAgIGJhY2tncm91bmQ6IHRyYW5zcGFyZW50OwogICAgYm9yZGVyOiBub25lOwogICAgY29sb3I6IHdoaXRlOwogICAgd2lkdGg6IDgwcHg7CiAgICB0ZXh0LWFsaWduOiBjZW50ZXI7CiAgICBmb250LXNpemU6IDE2cHg7CiAgICBvdXRsaW5lOiBub25lOwogIH0KICAuc2hpZnQtaW5wdXQgaW5wdXQ6Oi13ZWJraXQtb3V0ZXItc3Bpbi1idXR0b24sCiAgLnNoaWZ0LWlucHV0IGlucHV0Ojotd2Via2l0LWlubmVyLXNwaW4tYnV0dG9uIHsgLXdlYmtpdC1hcHBlYXJhbmNlOiBub25lOyB9CiAgLnVuaXQgeyBjb2xvcjogIzk0YTNiODsgZm9udC1zaXplOiAxNHB4OyBtYXJnaW4tbGVmdDogOHB4OyB9CiAgLmJ0biB7CiAgICBiYWNrZ3JvdW5kOiBsaW5lYXItZ3JhZGllbnQoOTBkZWcsICMzYjgyZjYsICM4YjVjZjYpOwogICAgY29sb3I6IHdoaXRlOwogICAgYm9yZGVyOiBub25lOwogICAgcGFkZGluZzogMTBweCAyMHB4OwogICAgYm9yZGVyLXJhZGl1czogOHB4OwogICAgY3Vyc29yOiBwb2ludGVyOwogICAgZm9udC1zaXplOiAxNHB4OwogICAgZm9udC13ZWlnaHQ6IDYwMDsKICAgIHRyYW5zaXRpb246IHRyYW5zZm9ybSAwLjFzOwogIH0KICAuYnRuOmhvdmVyIHsgdHJhbnNmb3JtOiB0cmFuc2xhdGVZKC0xcHgpOyB9CiAgLmJ0bjpkaXNhYmxlZCB7IG9wYWNpdHk6IDAuNDsgY3Vyc29yOiBub3QtYWxsb3dlZDsgdHJhbnNmb3JtOiBub25lOyB9CiAgLmJ0bi5zZWNvbmRhcnkgeyBiYWNrZ3JvdW5kOiAjMzM0MTU1OyB9CiAgLmZpbGUtaW5mbyB7CiAgICBiYWNrZ3JvdW5kOiAjMWUyOTNiOwogICAgcGFkZGluZzogMTJweCAxNnB4OwogICAgYm9yZGVyLXJhZGl1czogOHB4OwogICAgbWFyZ2luLWJvdHRvbTogMjBweDsKICAgIGZvbnQtc2l6ZTogMTRweDsKICAgIGRpc3BsYXk6IGZsZXg7CiAgICBqdXN0aWZ5LWNvbnRlbnQ6IHNwYWNlLWJldHdlZW47CiAgICBhbGlnbi1pdGVtczogY2VudGVyOwogIH0KICAuZmlsZS1pbmZvIC5uYW1lIHsgY29sb3I6ICM2MGE1ZmE7IGZvbnQtd2VpZ2h0OiA2MDA7IH0KICAuZmlsZS1pbmZvIC5zdGF0cyB7IGNvbG9yOiAjOTRhM2I4OyBmb250LXNpemU6IDEycHg7IH0KICAucHJldmlldyB7CiAgICBiYWNrZ3JvdW5kOiAjMWUyOTNiOwogICAgYm9yZGVyLXJhZGl1czogOHB4OwogICAgcGFkZGluZzogMTZweDsKICAgIG1heC1oZWlnaHQ6IDQwMHB4OwogICAgb3ZlcmZsb3cteTogYXV0bzsKICAgIGZvbnQtZmFtaWx5OiAiU0YgTW9ubyIsIE1vbmFjbywgbW9ub3NwYWNlOwogICAgZm9udC1zaXplOiAxM3B4OwogICAgbGluZS1oZWlnaHQ6IDEuNjsKICAgIHdoaXRlLXNwYWNlOiBwcmUtd3JhcDsKICAgIG1hcmdpbi1ib3R0b206IDIwcHg7CiAgfQogIC5wcmV2aWV3IC5ibG9jayB7IG1hcmdpbi1ib3R0b206IDEycHg7IHBhZGRpbmctYm90dG9tOiAxMnB4OyBib3JkZXItYm90dG9tOiAxcHggc29saWQgIzMzNDE1NTsgfQogIC5wcmV2aWV3IC5ibG9jazpsYXN0LWNoaWxkIHsgYm9yZGVyLWJvdHRvbTogbm9uZTsgfQogIC5wcmV2aWV3IC50aW1lIHsgY29sb3I6ICNmYmJmMjQ7IH0KICAucHJldmlldyAudGltZS5vbGQgeyBjb2xvcjogIzY0NzQ4YjsgdGV4dC1kZWNvcmF0aW9uOiBsaW5lLXRocm91Z2g7IG1hcmdpbi1yaWdodDogOHB4OyB9CiAgLnByZXZpZXcgLnRpbWUubmV3IHsgY29sb3I6ICMzNGQzOTk7IH0KICAucHJldmlldyAudGV4dCB7IGNvbG9yOiAjZTRlNGU3OyB9CiAgLnN0YXR1cyB7CiAgICBwYWRkaW5nOiAxMnB4IDE2cHg7CiAgICBib3JkZXItcmFkaXVzOiA4cHg7CiAgICBtYXJnaW4tYm90dG9tOiAxNnB4OwogICAgZm9udC1zaXplOiAxNHB4OwogIH0KICAuc3RhdHVzLnN1Y2Nlc3MgeyBiYWNrZ3JvdW5kOiByZ2JhKDUyLCAyMTEsIDE1MywgMC4xKTsgY29sb3I6ICMzNGQzOTk7IGJvcmRlcjogMXB4IHNvbGlkICMzNGQzOTk7IH0KICAuc3RhdHVzLmVycm9yIHsgYmFja2dyb3VuZDogcmdiYSgyMzksIDY4LCA2OCwgMC4xKTsgY29sb3I6ICNmODcxNzE7IGJvcmRlcjogMXB4IHNvbGlkICNmODcxNzE7IH0KICAubGFiZWwgeyBjb2xvcjogIzk0YTNiODsgZm9udC1zaXplOiAxM3B4OyBtYXJnaW4tYm90dG9tOiA4cHg7IGRpc3BsYXk6IGJsb2NrOyB9Cjwvc3R5bGU+CjwvaGVhZD4KPGJvZHk+CjxkaXYgY2xhc3M9ImNvbnRhaW5lciI+CiAgPGgxPvCfjqwgU1JUIFRpbWVzdGFtcCBTaGlmdGVyPC9oMT4KICA8cCBjbGFzcz0ic3VidGl0bGUiPlVwbG9hZCBhIHN1YnRpdGxlIGZpbGUgYW5kIHNoaWZ0IGFsbCB0aW1lc3RhbXBzIGJ5IGFueSBhbW91bnQgKHNlY29uZHMsIHBvc2l0aXZlIG9yIG5lZ2F0aXZlKS48L3A+CgogIDxsYWJlbCBjbGFzcz0iZHJvcC16b25lIiBpZD0iZHJvcFpvbmUiPgogICAgPGRpdiBjbGFzcz0iaWNvbiI+8J+TgTwvZGl2PgogICAgPHA+PHN0cm9uZz5DbGljayBvciBkcmFnICYgZHJvcDwvc3Ryb25nPiB5b3VyIC5zcnQgZmlsZSBoZXJlPC9wPgogICAgPGlucHV0IHR5cGU9ImZpbGUiIGlkPSJmaWxlSW5wdXQiIGFjY2VwdD0iLnNydCI+CiAgPC9sYWJlbD4KCiAgPGRpdiBpZD0iZmlsZUluZm8iIHN0eWxlPSJkaXNwbGF5Om5vbmUiIGNsYXNzPSJmaWxlLWluZm8iPgogICAgPHNwYW4+TG9hZGVkOiA8c3BhbiBjbGFzcz0ibmFtZSIgaWQ9ImZpbGVOYW1lIj48L3NwYW4+PC9zcGFuPgogICAgPHNwYW4gY2xhc3M9InN0YXRzIiBpZD0iZmlsZVN0YXRzIj48L3NwYW4+CiAgPC9kaXY+CgogIDxkaXYgaWQ9InN0YXR1cyI+PC9kaXY+CgogIDxkaXYgY2xhc3M9ImNvbnRyb2xzIj4KICAgIDxsYWJlbCBjbGFzcz0ibGFiZWwiIHN0eWxlPSJtYXJnaW46MCI+U2hpZnQgYnk6PC9sYWJlbD4KICAgIDxkaXYgY2xhc3M9InNoaWZ0LWlucHV0Ij4KICAgICAgPGJ1dHRvbiBpZD0iZGVjQnRuIj7iiJI8L2J1dHRvbj4KICAgICAgPGlucHV0IHR5cGU9Im51bWJlciIgaWQ9InNoaWZ0VmFsdWUiIHZhbHVlPSIyMSIgc3RlcD0iMC4xIj4KICAgICAgPGJ1dHRvbiBpZD0iaW5jQnRuIj4rPC9idXR0b24+CiAgICA8L2Rpdj4KICAgIDxzcGFuIGNsYXNzPSJ1bml0Ij5zZWNvbmRzPC9zcGFuPgogICAgPGJ1dHRvbiBjbGFzcz0iYnRuIiBpZD0iYXBwbHlCdG4iIGRpc2FibGVkPkFwcGx5IFNoaWZ0PC9idXR0b24+CiAgICA8YnV0dG9uIGNsYXNzPSJidG4gc2Vjb25kYXJ5IiBpZD0iZG93bmxvYWRCdG4iIGRpc2FibGVkPuKshyBEb3dubG9hZDwvYnV0dG9uPgogIDwvZGl2PgoKICA8bGFiZWwgY2xhc3M9ImxhYmVsIj5QcmV2aWV3IChmaXJzdCAxMCBibG9ja3MpOjwvbGFiZWw+CiAgPGRpdiBjbGFzcz0icHJldmlldyIgaWQ9InByZXZpZXciPgogICAgPHNwYW4gc3R5bGU9ImNvbG9yOiM2NDc0OGIiPk5vIGZpbGUgbG9hZGVkIHlldC48L3NwYW4+CiAgPC9kaXY+CjwvZGl2PgoKPHNjcmlwdD4KY29uc3QgZmlsZUlucHV0ID0gZG9jdW1lbnQuZ2V0RWxlbWVudEJ5SWQoJ2ZpbGVJbnB1dCcpOwpjb25zdCBkcm9wWm9uZSA9IGRvY3VtZW50LmdldEVsZW1lbnRCeUlkKCdkcm9wWm9uZScpOwpjb25zdCBmaWxlSW5mbyA9IGRvY3VtZW50LmdldEVsZW1lbnRCeUlkKCdmaWxlSW5mbycpOwpjb25zdCBmaWxlTmFtZSA9IGRvY3VtZW50LmdldEVsZW1lbnRCeUlkKCdmaWxlTmFtZScpOwpjb25zdCBmaWxlU3RhdHMgPSBkb2N1bWVudC5nZXRFbGVtZW50QnlJZCgnZmlsZVN0YXRzJyk7CmNvbnN0IHNoaWZ0VmFsdWUgPSBkb2N1bWVudC5nZXRFbGVtZW50QnlJZCgnc2hpZnRWYWx1ZScpOwpjb25zdCBhcHBseUJ0biA9IGRvY3VtZW50LmdldEVsZW1lbnRCeUlkKCdhcHBseUJ0bicpOwpjb25zdCBkb3dubG9hZEJ0biA9IGRvY3VtZW50LmdldEVsZW1lbnRCeUlkKCdkb3dubG9hZEJ0bicpOwpjb25zdCBwcmV2aWV3ID0gZG9jdW1lbnQuZ2V0RWxlbWVudEJ5SWQoJ3ByZXZpZXcnKTsKY29uc3Qgc3RhdHVzRWwgPSBkb2N1bWVudC5nZXRFbGVtZW50QnlJZCgnc3RhdHVzJyk7CgpsZXQgb3JpZ2luYWxDb250ZW50ID0gJyc7CmxldCBzaGlmdGVkQ29udGVudCA9ICcnOwpsZXQgb3JpZ2luYWxGaWxlTmFtZSA9ICcnOwoKLy8gRHJhZyAmIGRyb3AKWydkcmFnZW50ZXInLCdkcmFnb3ZlciddLmZvckVhY2goZSA9PiBkcm9wWm9uZS5hZGRFdmVudExpc3RlbmVyKGUsIGV2ID0+IHsKICBldi5wcmV2ZW50RGVmYXVsdCgpOyBkcm9wWm9uZS5jbGFzc0xpc3QuYWRkKCdkcmFnb3ZlcicpOwp9KSk7ClsnZHJhZ2xlYXZlJywnZHJvcCddLmZvckVhY2goZSA9PiBkcm9wWm9uZS5hZGRFdmVudExpc3RlbmVyKGUsIGV2ID0+IHsKICBldi5wcmV2ZW50RGVmYXVsdCgpOyBkcm9wWm9uZS5jbGFzc0xpc3QucmVtb3ZlKCdkcmFnb3ZlcicpOwp9KSk7CmRyb3Bab25lLmFkZEV2ZW50TGlzdGVuZXIoJ2Ryb3AnLCBldiA9PiB7CiAgaWYgKGV2LmRhdGFUcmFuc2Zlci5maWxlcy5sZW5ndGgpIGhhbmRsZUZpbGUoZXYuZGF0YVRyYW5zZmVyLmZpbGVzWzBdKTsKfSk7CmZpbGVJbnB1dC5hZGRFdmVudExpc3RlbmVyKCdjaGFuZ2UnLCBlID0+IHsKICBpZiAoZS50YXJnZXQuZmlsZXMubGVuZ3RoKSBoYW5kbGVGaWxlKGUudGFyZ2V0LmZpbGVzWzBdKTsKfSk7CgpmdW5jdGlvbiBoYW5kbGVGaWxlKGZpbGUpIHsKICBpZiAoIWZpbGUubmFtZS50b0xvd2VyQ2FzZSgpLmVuZHNXaXRoKCcuc3J0JykpIHsKICAgIHNob3dTdGF0dXMoJ1BsZWFzZSB1cGxvYWQgYSB2YWxpZCAuc3J0IGZpbGUnLCAnZXJyb3InKTsKICAgIHJldHVybjsKICB9CiAgb3JpZ2luYWxGaWxlTmFtZSA9IGZpbGUubmFtZTsKICBjb25zdCByZWFkZXIgPSBuZXcgRmlsZVJlYWRlcigpOwogIHJlYWRlci5vbmxvYWQgPSBlID0+IHsKICAgIG9yaWdpbmFsQ29udGVudCA9IGUudGFyZ2V0LnJlc3VsdDsKICAgIGZpbGVOYW1lLnRleHRDb250ZW50ID0gZmlsZS5uYW1lOwogICAgZmlsZVN0YXRzLnRleHRDb250ZW50ID0gKGZpbGUuc2l6ZSAvIDEwMjQpLnRvRml4ZWQoMSkgKyAnIEtCJzsKICAgIGZpbGVJbmZvLnN0eWxlLmRpc3BsYXkgPSAnZmxleCc7CiAgICBhcHBseUJ0bi5kaXNhYmxlZCA9IGZhbHNlOwogICAgc2hvd1N0YXR1cygnRmlsZSBsb2FkZWQuIENsaWNrICJBcHBseSBTaGlmdCIgdG8gcHJvY2Vzcy4nLCAnc3VjY2VzcycpOwogICAgcmVuZGVyUHJldmlldyhvcmlnaW5hbENvbnRlbnQsIG51bGwpOwogIH07CiAgcmVhZGVyLnJlYWRBc1RleHQoZmlsZSk7Cn0KCmZ1bmN0aW9uIHRpbWVUb01zKHQpIHsKICBjb25zdCBbaG1zLCBtc10gPSB0LnNwbGl0KCcsJyk7CiAgY29uc3QgW2gsIG0sIHNdID0gaG1zLnNwbGl0KCc6JykubWFwKE51bWJlcik7CiAgcmV0dXJuIGgqMzYwMDAwMCArIG0qNjAwMDAgKyBzKjEwMDAgKyBwYXJzZUludChtcyk7Cn0KZnVuY3Rpb24gbXNUb1RpbWUobXMpIHsKICBpZiAobXMgPCAwKSBtcyA9IDA7CiAgY29uc3QgaCA9IE1hdGguZmxvb3IobXMgLyAzNjAwMDAwKTsgbXMgJT0gMzYwMDAwMDsKICBjb25zdCBtID0gTWF0aC5mbG9vcihtcyAvIDYwMDAwKTsgbXMgJT0gNjAwMDA7CiAgY29uc3QgcyA9IE1hdGguZmxvb3IobXMgLyAxMDAwKTsKICBjb25zdCBtbW0gPSBtcyAlIDEwMDA7CiAgcmV0dXJuIGAke1N0cmluZyhoKS5wYWRTdGFydCgyLCcwJyl9OiR7U3RyaW5nKG0pLnBhZFN0YXJ0KDIsJzAnKX06JHtTdHJpbmcocykucGFkU3RhcnQoMiwnMCcpfSwke1N0cmluZyhtbW0pLnBhZFN0YXJ0KDMsJzAnKX1gOwp9CgpmdW5jdGlvbiBzaGlmdFNSVChjb250ZW50LCBzZWNvbmRzKSB7CiAgY29uc3QgbXMgPSBzZWNvbmRzICogMTAwMDsKICBjb25zdCByZWdleCA9IC8oXGR7Mn06XGR7Mn06XGR7Mn0sXGR7M30pXHMqLS0+XHMqKFxkezJ9OlxkezJ9OlxkezJ9LFxkezN9KS9nOwogIHJldHVybiBjb250ZW50LnJlcGxhY2UocmVnZXgsIChtYXRjaCwgc3RhcnQsIGVuZCkgPT4gewogICAgcmV0dXJuIGAke21zVG9UaW1lKHRpbWVUb01zKHN0YXJ0KSArIG1zKX0gLS0+ICR7bXNUb1RpbWUodGltZVRvTXMoZW5kKSArIG1zKX1gOwogIH0pOwp9CgphcHBseUJ0bi5hZGRFdmVudExpc3RlbmVyKCdjbGljaycsICgpID0+IHsKICBjb25zdCBzaGlmdCA9IHBhcnNlRmxvYXQoc2hpZnRWYWx1ZS52YWx1ZSk7CiAgaWYgKGlzTmFOKHNoaWZ0KSkgeyBzaG93U3RhdHVzKCdFbnRlciBhIHZhbGlkIG51bWJlcicsICdlcnJvcicpOyByZXR1cm47IH0KICBzaGlmdGVkQ29udGVudCA9IHNoaWZ0U1JUKG9yaWdpbmFsQ29udGVudCwgc2hpZnQpOwogIHJlbmRlclByZXZpZXcob3JpZ2luYWxDb250ZW50LCBzaGlmdGVkQ29udGVudCk7CiAgZG93bmxvYWRCdG4uZGlzYWJsZWQgPSBmYWxzZTsKICBzaG93U3RhdHVzKGDinJMgU2hpZnRlZCBhbGwgdGltZXN0YW1wcyBieSAke3NoaWZ0ID49IDAgPyAnKycgOiAnJ30ke3NoaWZ0fXNgLCAnc3VjY2VzcycpOwp9KTsKCmRvd25sb2FkQnRuLmFkZEV2ZW50TGlzdGVuZXIoJ2NsaWNrJywgKCkgPT4gewogIGNvbnN0IGJsb2IgPSBuZXcgQmxvYihbc2hpZnRlZENvbnRlbnRdLCB7IHR5cGU6ICd0ZXh0L3BsYWluO2NoYXJzZXQ9dXRmLTgnIH0pOwogIGNvbnN0IHVybCA9IFVSTC5jcmVhdGVPYmplY3RVUkwoYmxvYik7CiAgY29uc3QgYSA9IGRvY3VtZW50LmNyZWF0ZUVsZW1lbnQoJ2EnKTsKICBjb25zdCBuZXdOYW1lID0gb3JpZ2luYWxGaWxlTmFtZS5yZXBsYWNlKC9cLnNydCQvaSwgJycpICsgYF9zaGlmdGVkJHtzaGlmdFZhbHVlLnZhbHVlfXMuc3J0YDsKICBhLmhyZWYgPSB1cmw7IGEuZG93bmxvYWQgPSBuZXdOYW1lOwogIGEuY2xpY2soKTsKICBVUkwucmV2b2tlT2JqZWN0VVJMKHVybCk7Cn0pOwoKZG9jdW1lbnQuZ2V0RWxlbWVudEJ5SWQoJ2luY0J0bicpLmFkZEV2ZW50TGlzdGVuZXIoJ2NsaWNrJywgKCkgPT4gewogIHNoaWZ0VmFsdWUudmFsdWUgPSAocGFyc2VGbG9hdChzaGlmdFZhbHVlLnZhbHVlKSArIDEpLnRvRml4ZWQoMSk7Cn0pOwpkb2N1bWVudC5nZXRFbGVtZW50QnlJZCgnZGVjQnRuJykuYWRkRXZlbnRMaXN0ZW5lcignY2xpY2snLCAoKSA9PiB7CiAgc2hpZnRWYWx1ZS52YWx1ZSA9IChwYXJzZUZsb2F0KHNoaWZ0VmFsdWUudmFsdWUpIC0gMSkudG9GaXhlZCgxKTsKfSk7CgpmdW5jdGlvbiByZW5kZXJQcmV2aWV3KG9yaWcsIHNoaWZ0ZWQpIHsKICBjb25zdCBibG9ja3MgPSBvcmlnLnRyaW0oKS5zcGxpdCgvXG5ccypcbi8pLnNsaWNlKDAsIDEwKTsKICBjb25zdCBzaGlmdGVkQmxvY2tzID0gc2hpZnRlZCA/IHNoaWZ0ZWQudHJpbSgpLnNwbGl0KC9cblxzKlxuLykuc2xpY2UoMCwgMTApIDogbnVsbDsKICBwcmV2aWV3LmlubmVySFRNTCA9IGJsb2Nrcy5tYXAoKGIsIGkpID0+IHsKICAgIGNvbnN0IGxpbmVzID0gYi5zcGxpdCgnXG4nKTsKICAgIGNvbnN0IHRpbWVMaW5lID0gbGluZXNbMV0gfHwgJyc7CiAgICBjb25zdCB0ZXh0TGluZXMgPSBsaW5lcy5zbGljZSgyKS5qb2luKCdcbicpOwogICAgbGV0IHRpbWVIdG1sOwogICAgaWYgKHNoaWZ0ZWRCbG9ja3MgJiYgc2hpZnRlZEJsb2Nrc1tpXSkgewogICAgICBjb25zdCBzTGluZXMgPSBzaGlmdGVkQmxvY2tzW2ldLnNwbGl0KCdcbicpOwogICAgICBjb25zdCBzVGltZSA9IHNMaW5lc1sxXSB8fCAnJzsKICAgICAgY29uc3QgW29TdGFydCwgb0VuZF0gPSB0aW1lTGluZS5zcGxpdCgnLS0+JykubWFwKHMgPT4gcy50cmltKCkpOwogICAgICBjb25zdCBbblN0YXJ0LCBuRW5kXSA9IHNUaW1lLnNwbGl0KCctLT4nKS5tYXAocyA9PiBzLnRyaW0oKSk7CiAgICAgIHRpbWVIdG1sID0gYDxzcGFuIGNsYXNzPSJ0aW1lIG9sZCI+JHtvU3RhcnR9IOKGkiAke29FbmR9PC9zcGFuPjxzcGFuIGNsYXNzPSJ0aW1lIG5ldyI+JHtuU3RhcnR9IOKGkiAke25FbmR9PC9zcGFuPmA7CiAgICB9IGVsc2UgewogICAgICB0aW1lSHRtbCA9IGA8c3BhbiBjbGFzcz0idGltZSI+JHt0aW1lTGluZX08L3NwYW4+YDsKICAgIH0KICAgIHJldHVybiBgPGRpdiBjbGFzcz0iYmxvY2siPjxkaXY+IyR7bGluZXNbMF19PC9kaXY+PGRpdj4ke3RpbWVIdG1sfTwvZGl2PjxkaXYgY2xhc3M9InRleHQiPiR7ZXNjYXBlSHRtbCh0ZXh0TGluZXMpfTwvZGl2PjwvZGl2PmA7CiAgfSkuam9pbignJyk7Cn0KCmZ1bmN0aW9uIGVzY2FwZUh0bWwocykgewogIHJldHVybiBzLnJlcGxhY2UoL1smPD5dL2csIGMgPT4gKHsnJic6JyZhbXA7JywnPCc6JyZsdDsnLCc+JzonJmd0Oyd9W2NdKSk7Cn0KCmZ1bmN0aW9uIHNob3dTdGF0dXMobXNnLCB0eXBlKSB7CiAgc3RhdHVzRWwuaW5uZXJIVE1MID0gYDxkaXYgY2xhc3M9InN0YXR1cyAke3R5cGV9Ij4ke21zZ308L2Rpdj5gOwp9Cjwvc2NyaXB0Pgo8L2JvZHk+CjwvaHRtbD4K"
-};
-
-// Load the inline Fee Analyzer source (v2) and un-escape its closing script tags
-APP_SOURCES.app2 = document.getElementById('src-app2').textContent.trim()
-  .replace(/<\\\/script>/gi, '</' + 'script>');
-
-// Decode base64 -> UTF-8 string safely (handles emoji / multi-byte chars)
-function b64ToUtf8(b64) {
-  const binary = atob(b64);
-  const bytes = new Uint8Array(binary.length);
-  for (let i = 0; i < binary.length; i++) bytes[i] = binary.charCodeAt(i);
-  return new TextDecoder('utf-8').decode(bytes);
-}
-
-const loadedFrames = {};
-
-function ensureFrameLoaded(key) {
-  if (loadedFrames[key]) return;
-  const frame = document.getElementById('frame-' + key);
-  if(frame && APP_SOURCES[key]) {
-    frame.srcdoc = b64ToUtf8(APP_SOURCES[key]);
-    loadedFrames[key] = true;
-  }
-}
-
-function escapeHtml(str) {
-  if (!str) return '';
-  const div = document.createElement('div');
-  div.textContent = str;
-  return div.innerHTML;
-}
-
-function renderCustomApps() {
-  const apps = JSON.parse(localStorage.getItem('fuadsToolboxCustomApps') || '[]');
-  
-  // Remove previously rendered custom elements to avoid duplicates
-  document.querySelectorAll('.custom-tab, .custom-card, .custom-frame-wrap').forEach(el => el.remove());
-
-  apps.forEach(app => {
-    // 1. Tab button
-    const tabBtn = document.createElement('button');
-    tabBtn.className = 'tab-btn custom-tab';
-    tabBtn.dataset.target = app.id;
-    tabBtn.innerHTML = `<span class="emoji">${escapeHtml(app.icon || '📦')}</span> ${escapeHtml(app.title)}`;
-    tabBtn.onclick = () => showView(app.id);
-    document.querySelector('.tabbar').appendChild(tabBtn);
-
-    // 2. Landing card
-    const card = document.createElement('div');
-    card.className = 'app-card custom-card';
-    card.onclick = () => showView(app.id);
-    card.innerHTML = `
-      <div class="icon">${escapeHtml(app.icon || '📦')}</div>
-      <h3>${escapeHtml(app.title)}</h3>
-      <p>${escapeHtml(app.desc)}</p>
-      <div class="go">Open tool →</div>
-    `;
-    document.querySelector('.landing-grid').appendChild(card);
-
-    // 3. Frame wrap
-    const wrap = document.createElement('div');
-    wrap.className = 'app-frame-wrap custom-frame-wrap';
-    wrap.id = `view-${app.id}`;
-    wrap.innerHTML = `
-      <div class="app-frame-header">
-        <div>
-          <div class="title">${escapeHtml(app.icon || '📦')} ${escapeHtml(app.title)}</div>
-          <div class="desc">${escapeHtml(app.desc)}</div>
-        </div>
-        <div style="display: flex; gap: 8px;">
-          <button class="open-new-tab" onclick="openCustomInNewTab('${app.id}')">Open in new tab ↗</button>
-          <button class="delete-app-btn" onclick="deleteCustomApp('${app.id}')" style="background:#fff; color:#c0392b; border:1.5px solid #c0392b; padding:6px 12px; border-radius:8px; font-size:12.5px; font-weight:600; cursor:pointer;">Delete 🗑️</button>
-        </div>
-      </div>
-      <iframe class="app-frame" id="frame-${app.id}"></iframe>
-    `;
-    document.querySelector('main.hub-main').appendChild(wrap);
-  });
-}
-
-function openAddAppModal() {
-  document.getElementById('addAppModal').classList.add('active');
-}
-
-function closeAddAppModal() {
-  document.getElementById('addAppModal').classList.remove('active');
-  document.getElementById('newAppTitle').value = '';
-  document.getElementById('newAppIcon').value = '';
-  document.getElementById('newAppDesc').value = '';
-  document.getElementById('newAppCode').value = '';
-}
-
-function saveNewApp() {
-  const title = document.getElementById('newAppTitle').value.trim();
-  const icon = document.getElementById('newAppIcon').value.trim() || '📦';
-  const desc = document.getElementById('newAppDesc').value.trim() || 'Custom app';
-  const code = document.getElementById('newAppCode').value.trim();
-
-  if (!title) { alert('Please enter a title.'); return; }
-  if (!code) { alert('Please paste the HTML code.'); return; }
-
-  const id = 'custom_' + Date.now();
-  const newApp = { id, title, icon, desc, code };
-  
-  let apps = JSON.parse(localStorage.getItem('fuadsToolboxCustomApps') || '[]');
-  apps.push(newApp);
-  localStorage.setItem('fuadsToolboxCustomApps', JSON.stringify(apps));
-
-  closeAddAppModal();
-  renderCustomApps();
-  showView(id);
-}
-
-function deleteCustomApp(id) {
-  if (!confirm('Are you sure you want to delete this custom app?')) return;
-  let apps = JSON.parse(localStorage.getItem('fuadsToolboxCustomApps') || '[]');
-  apps = apps.filter(a => a.id !== id);
-  localStorage.setItem('fuadsToolboxCustomApps', JSON.stringify(apps));
-  renderCustomApps();
-  showView('landing');
-}
-
-function openCustomInNewTab(id) {
-  const apps = JSON.parse(localStorage.getItem('fuadsToolboxCustomApps') || '[]');
-  const app = apps.find(a => a.id === id);
-  if (app) {
-    const blob = new Blob([app.code], { type: 'text/html' });
-    const url = URL.createObjectURL(blob);
-    window.open(url, '_blank');
-  }
-}
-
-function showView(target) {
-  // Toggle nav buttons
-  document.querySelectorAll('.tab-btn').forEach(btn => {
-    btn.classList.toggle('active', btn.dataset.target === target);
-  });
-
-  // Toggle landing view
-  document.getElementById('landingView').classList.toggle('hidden', target !== 'landing');
-
-  // Toggle app frame wraps
-  document.querySelectorAll('.app-frame-wrap').forEach(wrap => {
-    const wrapId = wrap.id.replace('view-', '');
-    const active = wrapId === target;
-    wrap.classList.toggle('active', active);
-    if (active) {
-      if (wrapId.startsWith('custom_')) {
-        const frame = document.getElementById('frame-' + wrapId);
-        if (frame && !frame.srcdoc) {
-          const apps = JSON.parse(localStorage.getItem('fuadsToolboxCustomApps') || '[]');
-          const app = apps.find(a => a.id === wrapId);
-          if (app) frame.srcdoc = app.code;
-        }
-      } else {
-        ensureFrameLoaded(wrapId);
-      }
-    }
-  });
-
-  window.scrollTo({ top: 0, behavior: 'smooth' });
-}
-
-function openInNewTab(key) {
-  const html = APP_SOURCES[key].startsWith('PCFET0NUWVBFIGh0bWw') ? b64ToUtf8(APP_SOURCES[key]) : APP_SOURCES[key];
-  const blob = new Blob([html], { type: 'text/html' });
-  const url = URL.createObjectURL(blob);
-  window.open(url, '_blank');
-}
-
-// Initialize custom apps on load
-renderCustomApps();
-</script>
-
 </body>
 </html>
