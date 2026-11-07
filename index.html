@@ -419,16 +419,14 @@
   label.field-label { display: block; font-size: 12px; font-weight: 600; color: var(--ink-mid); text-transform: uppercase; letter-spacing: .5px; margin-bottom: 7px; }
   .field-hint { font-size: 11px; color: var(--ink-faint); margin-top: 6px; font-style: italic; }
 
+  /* One single chip style — used by BOTH Fees and Mock subject selectors (teal) */
   .chip-row { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 4px; }
   .chip { padding: 5px 13px; border-radius: 20px; font-size: 13px; font-weight: 500; border: 1.5px solid var(--border); background: var(--cream); cursor: pointer; transition: all .15s; user-select: none; }
   .chip.active { background: var(--teal-deep); color: #fff; border-color: var(--teal-deep); }
-  .chip.amber { border-color: #e0c68a; background: #fdf8ec; color: var(--amber-deep); }
-  .chip.amber.active { background: var(--amber); color: #fff; border-color: var(--amber); }
-  .chip.disabled { opacity: .45; cursor: not-allowed; }
 
   .section-divider { border: none; border-top: 1px dashed var(--border); margin: 22px 0 18px; }
-  .section-title { font-size: 14px; font-weight: 700; color: var(--amber-deep); text-transform: uppercase; letter-spacing: .5px; margin-bottom: 14px; display: flex; align-items: center; gap: 8px; }
-  .section-title::before { content: ''; display: inline-block; width: 4px; height: 18px; background: var(--amber); border-radius: 2px; }
+  .section-title { font-size: 14px; font-weight: 700; color: var(--teal-deep); text-transform: uppercase; letter-spacing: .5px; margin-bottom: 14px; display: flex; align-items: center; gap: 8px; }
+  .section-title::before { content: ''; display: inline-block; width: 4px; height: 18px; background: var(--teal-deep); border-radius: 2px; }
 
   .btn-analyze { display: block; width: 100%; margin-top: 22px; padding: 14px; background: var(--teal-deep); color: #fff; border: none; border-radius: 8px; font-size: 15px; font-weight: 600; cursor: pointer; letter-spacing: .2px; transition: background .15s, transform .1s; }
   .btn-analyze:hover  { background: var(--teal-mid); }
@@ -544,7 +542,7 @@
         <div class="field-hint">✓ Uses the same months selected above for Fees.</div>
       </div>
       <div>
-        <label class="field-label">Mock Subjects <span style="font-weight:400; color:var(--ink-faint);">(multi-select — toggle on/off)</span></label>
+        <label class="field-label">Mock Subjects <span style="font-weight:400; color:var(--ink-faint);">(multi-select — click to include in PDF)</span></label>
         <div class="chip-row" id="mockSubjectChips"></div>
         <div class="field-hint" id="mockHint">No mock collection blocks detected in this file.</div>
       </div>
@@ -588,13 +586,13 @@
 <script>
 // ─── STATE ──────────────────────────────────────────────────────────────
 let workbook = null;
-let allData  = [];    // parsed FEE rows across all selected sheets
-let mockDataRaw = []; // ALL parsed MOCK rows (unfiltered by subject)
+let allData  = [];        // parsed FEE rows across selected sheets
+let mockDataRaw = [];     // ALL parsed MOCK rows (subject-filtered later)
 let mockTitle = '';
-let selectedMonths   = new Set();
-let selectedSubject  = '';
-let selectedMockSubjects = new Set();
-let availableMockSubjects  = [];
+let selectedMonths       = new Set();
+let selectedSubject      = '';
+let selectedMockSubjects = new Set();   // starts EMPTY — user must choose
+let availableMockSubjects = [];
 let currentTab = 'due';
 let currentRows = [];
 
@@ -634,10 +632,6 @@ function handleFile(file) {
 const up = r => r.map(c => String(c).trim().toUpperCase());
 const isEmptyRow = r => r.every(c => String(c).trim() === '');
 
-/**
- * Scans a sheet for the Mock Collection title row + subject header.
- * Returns { titleIdx, titleText, endIdx, subjectCols: [{idx,name},...] } or null.
- */
 function detectMockBlock(sheetName) {
   const ws = workbook.Sheets[sheetName];
   const raw = XLSX.utils.sheet_to_json(ws, { header: 1, defval: '' });
@@ -650,7 +644,6 @@ function detectMockBlock(sheetName) {
   }
   if (mtIdx < 0) return null;
 
-  // Skip blanks to find the subject header row
   let h = mtIdx + 1;
   while (h < raw.length && isEmptyRow(raw[h])) h++;
   if (h >= raw.length) return null;
@@ -665,7 +658,6 @@ function detectMockBlock(sheetName) {
     }
   });
 
-  // Find end of mock block (blank row, or next NAME+MATHS header)
   let endIdx = raw.length;
   for (let i = h + 1; i < raw.length; i++) {
     if (isEmptyRow(raw[i])) { endIdx = i; break; }
@@ -728,51 +720,57 @@ function buildConfig() {
   });
   selectedSubject = detectedSubjects.includes('PHYSICS') ? 'PHYSICS' : detectedSubjects[0] || '';
 
-  // --- MOCK SUBJECT CHIPS (multi-select, amber-styled) ---
+  // --- MOCK SUBJECT CHIPS (multi-select, NOTHING pre-selected, same teal style) ---
   const mockSubjectSet = new Set();
   let anyMock = false;
-  let detectedMockTitle = '';
   sheets.forEach(s => {
     const mb = detectMockBlock(s);
     if (mb && mb.subjectCols.length) {
       anyMock = true;
-      if (!detectedMockTitle) detectedMockTitle = mb.titleText;
       mb.subjectCols.forEach(c => mockSubjectSet.add(c.name));
     }
   });
   availableMockSubjects = [...mockSubjectSet];
-  selectedMockSubjects = new Set(availableMockSubjects); // default: all on
+  selectedMockSubjects = new Set();   // ← empty: user selects manually
 
   const msc = document.getElementById('mockSubjectChips');
-  const mhint = document.getElementById('mockHint');
   msc.innerHTML = '';
 
   if (!anyMock) {
+    const mhint = document.getElementById('mockHint');
     mhint.textContent = '⚠️ No mock collection blocks detected in this file.';
     mhint.style.color = 'var(--amber-deep)';
   } else {
-    mhint.textContent = `${availableMockSubjects.length} subject(s) detected. Toggle to include/exclude from the PDF.`;
-    mhint.style.color = 'var(--ink-faint)';
-
     availableMockSubjects.forEach(sub => {
       const chip = document.createElement('div');
-      chip.className = 'chip amber active';
+      chip.className = 'chip';          // ← identical style to Fees chips (teal when active)
       chip.textContent = sub;
       chip.onclick = () => {
-        if (chip.classList.contains('active')) {
-          chip.classList.remove('active');
-          selectedMockSubjects.delete(sub);
-        } else {
-          chip.classList.add('active');
-          selectedMockSubjects.add(sub);
-        }
+        chip.classList.toggle('active');
+        if (chip.classList.contains('active')) selectedMockSubjects.add(sub);
+        else selectedMockSubjects.delete(sub);
+        updateMockHint();
       };
       msc.appendChild(chip);
     });
+    updateMockHint();
   }
 
   document.getElementById('configSection').classList.remove('hidden');
   updateAnalyzeBtn();
+}
+
+function updateMockHint() {
+  const mhint = document.getElementById('mockHint');
+  if (!availableMockSubjects.length) return;
+  const n = selectedMockSubjects.size;
+  if (n) {
+    mhint.textContent = `✅ ${n} of ${availableMockSubjects.length} mock subject(s) selected for the PDF.`;
+    mhint.style.color = 'var(--green)';
+  } else {
+    mhint.textContent = `⚠️ ${availableMockSubjects.length} subject(s) detected — none selected. Click chips to include them in the Mock PDF section.`;
+    mhint.style.color = 'var(--amber-deep)';
+  }
 }
 
 function updateAnalyzeBtn() {
@@ -780,7 +778,7 @@ function updateAnalyzeBtn() {
   btn.disabled = !(selectedMonths.size > 0 && selectedSubject);
 }
 
-// ─── PARSE SHEET (returns fee + mock rows) ────────────────────────────
+// ─── PARSE SHEET ─────────────────────────────────────────────────────────
 function parseSheet(sheetName) {
   const ws  = workbook.Sheets[sheetName];
   const raw = XLSX.utils.sheet_to_json(ws, { header: 1, defval: '' });
@@ -808,7 +806,6 @@ function parseSheet(sheetName) {
     }
   }
 
-  // --- Fee table: find NAME+MATHS header OUTSIDE the mock block ---
   let headerIdx = -1, headers = [];
   for (let i = 0; i < raw.length; i++) {
     if (mb && i >= mb.titleIdx && i < mb.endIdx) continue;
@@ -845,7 +842,7 @@ function parseSheet(sheetName) {
   return { feeRows, mockRows, mockTitle: mb?.titleText || '' };
 }
 
-// ─── ANALYZE ────────────────────────────────────────────────────────────
+// ─── ANALYZE ─────────────────────────────────────────────────────────────
 document.getElementById('analyzeBtn').addEventListener('click', analyze);
 
 function analyze() {
@@ -877,12 +874,11 @@ function analyze() {
   }, 200);
 }
 
-// Filter mock rows by selected months (already filtered during parse) + selected mock subjects
 function getFilteredMockRows() {
   return mockDataRaw.filter(r => selectedMockSubjects.has(r.subject));
 }
 
-// ─── SUMMARY ───────────────────────────────────────────────────────────
+// ─── SUMMARY ─────────────────────────────────────────────────────────────
 function renderSummary() {
   const due  = allData.filter(r => r.status === 'DUE');
   const paid = allData.filter(r => r.status === 'PAID');
@@ -939,7 +935,7 @@ function renderSummary() {
   document.getElementById('summaryGrid').innerHTML = html;
 }
 
-// ─── TABS / TABLE ───────────────────────────────────────────────────────
+// ─── TABS / TABLE ────────────────────────────────────────────────────────
 function switchTab(tab) {
   currentTab = tab;
   ['due','paid','all'].forEach(t => {
@@ -991,7 +987,7 @@ function renderTable(data) {
 
 function filterTable() { renderTable(allData); }
 
-// ─── PDF EXPORT ─────────────────────────────────────────────────────────
+// ─── PDF EXPORT ──────────────────────────────────────────────────────────
 function exportPDF() {
   const paidRows = allData.filter(r => r.status === 'PAID');
   const mockRows = getFilteredMockRows();
@@ -1016,7 +1012,6 @@ function exportPDF() {
   };
   const ensureSpace = (y, need) => { if (y > PAGE_H - need) { doc.addPage(); return 20; } return y; };
 
-  // Main header
   doc.setFillColor(13, 92, 99); doc.rect(0, 0, 210, 38, 'F');
   doc.setFont('helvetica','bold'); doc.setFontSize(18); doc.setTextColor(255,255,255);
   doc.text('IBC — Fee Collection List', 15, 16);
@@ -1080,7 +1075,7 @@ function exportPDF() {
     y += 12;
   }
 
-  // ═══════ SECTION 2 — MOCK COLLECTION (only if filtered rows exist) ═══════
+  // ═══════ SECTION 2 — MOCK (only selected subjects) ═══════
   if (mockRows.length) {
     doc.addPage();
     doc.setFillColor(232, 160, 32); doc.rect(0, 0, 210, 30, 'F');
@@ -1144,7 +1139,7 @@ function exportPDF() {
   showToast(`📄 PDF exported — ${paidRows.length} fee + ${mockRows.length} mock row(s)`);
 }
 
-// ─── HELPERS ────────────────────────────────────────────────────────────
+// ─── HELPERS ─────────────────────────────────────────────────────────────
 function fmtBDT(n) { return Number(n).toLocaleString('en-IN'); }
 
 function showToast(msg) {
